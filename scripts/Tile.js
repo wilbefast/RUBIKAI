@@ -30,8 +30,8 @@ var Tile = function() {
     useful.copy_entries(args, this, [ "grid", "row", "col" ]);
     
     // draw position
-    this.draw_x = this.col*this.draw_w;
-    this.draw_y = this.row*this.draw_h;
+    this.draw_x = this.grid.draw_x + this.col*this.draw_w;
+    this.draw_y = this.grid.draw_y + this.row*this.draw_h;
 
     // done
     return this;
@@ -39,6 +39,8 @@ var Tile = function() {
 
   Tile.prototype.draw_w = 32;
   Tile.prototype.draw_h = 32;
+
+  Tile.prototype.DEBUG = true;
 
   // ------------------------------------------------------------------------------------------
   // UPDATE
@@ -50,6 +52,10 @@ var Tile = function() {
     }
     else {
       ctx.strokeRect(this.draw_x, this.draw_y, this.draw_w, this.draw_h);      
+    }
+
+    if(this.DEBUG) {
+      ctx.fillText("" + this.col + "," + this.row, this.draw_x, this.draw_y + this.draw_h*0.5);
     }
   };
   

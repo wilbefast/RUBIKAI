@@ -98,7 +98,7 @@ var main = function() {
       ctx.translate(ctx.off_x + 0.5, ctx.off_y + 0.5); // the 0.5 prevents blurred lines
       grid.draw();
       objects.draw();
-      //cursor.draw();
+      cursor.draw();
     ctx.restore();
 
     // scale and copy to the destination canvas

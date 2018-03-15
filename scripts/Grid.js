@@ -28,17 +28,26 @@ var Grid = function() {
 
       // check parameters
       useful.copy_entries(args, this, [ "n_cols", "n_rows", "tile_class" ]);
+      
+      // rendering
+      this.tile_draw_w = this.tile_class.prototype.draw_w;
+      this.tile_draw_h = this.tile_class.prototype.draw_h;
+      this.draw_w = this.n_cols*this.tile_draw_w;
+      this.draw_h = this.n_rows*this.tile_draw_h;
+      this.draw_x = (ctx.canvas.width - this.draw_w)*0.5;
+      this.draw_y = (ctx.canvas.width - this.draw_h)*0.5;
 
       // build tiles
-      this.tiles = [];
-      for(var col = 0; col < this.n_cols + this.n_rows; col++) {
+      this.tiles = new Array(this.n_cols * this.n_rows);
+      for(var col = 0; col < this.n_cols; col++) {
         for(var row = 0; row < this.n_rows; row++) {
           var tile = new this.tile_class({
             grid : this,
             col : col,
             row : row
           });
-          this.tiles[col + (this.n_cols + this.n_rows)*row] = tile;
+          var index = col + this.n_cols*row; 
+          this.tiles[index] = tile;
         }
       }
 
@@ -81,14 +90,6 @@ var Grid = function() {
         }
       }
 
-      // rendering
-      this.tile_draw_w = this.tiles[0].draw_w;
-      this.tile_draw_h = this.tiles[0].draw_h;
-      this.draw_w = this.n_cols*this.tile_draw_w;
-      this.draw_h = this.n_rows*this.tile_draw_h;
-      this.draw_x = 0;
-      this.draw_y = 0;
-    
       // done
       return this;
     }
