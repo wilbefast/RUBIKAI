@@ -15,62 +15,46 @@ Lesser General Public License for more details.
 "use strict";
 
 // ----------------------------------------------------------------------------
-// CURSOR MANAGER
+// MAIN LOOP FOR MAZE GENERATION AND A* DEMO
 // ----------------------------------------------------------------------------
 
-var cursor = function() {
-  var cursor = {
-    x : 0,
-    y : 0,
-    allow_input : true
+var mode_astar = function() {
+  var mode_astar = {
   }
-  
-  cursor.move_to = function(x, y) {
-    cursor.x = x;
-    cursor.y = y;
-    
-    if(!cursor.allow_input) {
-      return;
-    }
-    
-    // hover over tiles
-    var new_tile = grid.pixel_to_tile(cursor.x, cursor.y);
-  
-    if(new_tile != cursor.tile) {
-      cursor.tile = new_tile;
-    }
-  }
-  
-  cursor.left_click = function() {
-    if(!cursor.allow_input) {
-      return;
-    }
 
-    if(cursor.tile) {
-      mode.left_click(cursor.tile)
-    }
-  }
-  
-  cursor.right_click = function(shiftHeld) {
-    if(!cursor.allow_input) {
-      return;
-    }
+  mode_astar.init = function() {
 
-    if(cursor.tile) {
-      mode.right_click(cursor.tile)
+    // set random seed, for easier debugging
+    Math.seedrandom('To be or not to be, that is the question.');
+
+    // create a nice big grid
+    grid = new Grid({
+      n_cols : 80,
+      n_rows : 40,
+      tile_class : Tile
+    });
+
+    // create a maze
+    babysitter.add(ai.generate_maze);
+
+    // spawn the player
+    babysitter.add(ai.spawn_player);
+  }
+
+  mode_astar.left_click = function(tile) {
+    // calculate path for player
+    if(!ai.is_busy() && tile.is_type("free")) {
+      babysitter.add(ai.move_to, tile);
     }
   }
 
-  cursor.draw = function() {
-    if(cursor.DEBUG) {
-      ctx.fillStyle = "white";
-      ctx.fillRect(cursor.x - 4, cursor.y - 4, 8, 8)    
-    }
+  mode_astar.right_click = function(tile) {
+    // right click is not bound to anything
   }
 
   // ------------------------------------------------------------------------------------------
   // EXPORT
   // ------------------------------------------------------------------------------------------
 
-  return cursor;
+  return mode_astar;
 }();

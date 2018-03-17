@@ -18,8 +18,10 @@ Lesser General Public License for more details.
 
 "use strict";
 
+// global variables: we'd want to do this more cleanly if this were a 'real' project
 var ctx;
 var grid;
+var mode;
 
 var main = function() {
 
@@ -36,22 +38,19 @@ var main = function() {
   dest_ctx.off_y = 0;
 
   // ----------------------------------------------------------------------------
-  // CREATE MAZE
+  // FIGURE OUT WHICH MODE WE'RE RUNNING
   // ----------------------------------------------------------------------------
 
-  Math.seedrandom('To be or not to be, that is the question.');
+  mode = mode_astar;
 
-  grid = new Grid({
-    n_cols : 80,
-    n_rows : 40,
-    tile_class : Tile
-  });
+  // ----------------------------------------------------------------------------
+  // DO WHATEVER SETUP THIS MODE REQUIRES
+  // ----------------------------------------------------------------------------
 
-  babysitter.add(ai.generate_maze);
-  babysitter.add(ai.spawn_player);
+  mode.init();
   
   // ----------------------------------------------------------------------------
-  // MOUSE INPUT
+  // LINK UP MOUSE INPUT
   // ----------------------------------------------------------------------------
 
   dest_ctx.canvas.addEventListener('mousemove', function(event) {
@@ -72,7 +71,7 @@ var main = function() {
   }, false);
 
   // ----------------------------------------------------------------------------
-  // ANIMATION
+  // START REQUESTING ANIMATION FRAME
   // ----------------------------------------------------------------------------
 
   function update(dt) {
@@ -85,8 +84,6 @@ var main = function() {
     dest_ctx.off_x = (dest_can.width - can.width*dest_ctx.global_scale)*0.5;
     dest_ctx.off_y = (dest_can.height - can.height*dest_ctx.global_scale)*0.5;
 
-    grid.update(dt);
-    objects.update(dt);
     babysitter.update(dt);
   }
 
