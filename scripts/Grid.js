@@ -35,7 +35,7 @@ var Grid = function() {
       this.draw_w = this.n_cols*this.tile_draw_w;
       this.draw_h = this.n_rows*this.tile_draw_h;
       this.draw_x = (ctx.canvas.width - this.draw_w)*0.5;
-      this.draw_y = (ctx.canvas.width - this.draw_h)*0.5;
+      this.draw_y = (ctx.canvas.height - this.draw_h)*0.5;
 
       // build tiles
       this.tiles = new Array(this.n_cols * this.n_rows);
@@ -139,10 +139,18 @@ var Grid = function() {
     // QUERY
     // ------------------------------------------------------------------------------------------
     
-    Grid.prototype.get_random_tile = function() {
-      return useful.rand_in(this.tiles);
-    }
+    Grid.prototype.get_random_tile = function(such_that) {
+      var indices = useful.get_random_order(this.tiles.length);
+      for(var i = 0; i < indices.length; i++) {
+        var tile = this.tiles[indices[i]];
+        if(!such_that || such_that(tile)) {
+          return tile;
+        }
+      }
 
+      return null;
+    }
+    
     Grid.prototype.map = function(f) {
       for(var i = 0; i < this.tiles.length; i++) {
         var tile = this.tiles[i];
@@ -163,13 +171,28 @@ var Grid = function() {
       }
     };
 
+    Grid.prototype.map_rectangle = function(start_col, start_row, w, h, f) {
+      for(var col = start_col; col < start_col + w; col++) {
+        for(var row = start_row; row < start_row + h; row++) {
+          var result;
+          if(this.is_valid_grid(col, row)) {
+            result = f(this.tiles[row*this.n_cols + col], col, row);
+          }
+          else {
+            result = f(null, col, row);
+          }
+
+          if(result) {
+            return result;
+          }
+        }
+      }
+    }
+
     Grid.prototype.get_most = function(f) {
       var highest_value = -Infinity;
       var highest_value_tile = null;
-      var indices = [];
-      for(var i = 0; i < this.tiles.length; i++) {
-        indices[i] = i;
-      }
+      var indices = useful.get_random_order(this.tiles.length);
 
       useful.shuffle(indices);
 
@@ -188,10 +211,7 @@ var Grid = function() {
     Grid.prototype.get_least = function(f) {
       var lowest_value = Infinity;
       var lowest_value_tile = null;
-      var indices = [];
-      for(var i = 0; i < this.tiles.length; i++) {
-        indices[i] = i;
-      }
+      var indices = useful.get_random_order(this.tiles.length);
 
       useful.shuffle(indices);
 

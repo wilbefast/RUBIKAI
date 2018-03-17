@@ -58,7 +58,7 @@ var Tile = function() {
     free : {
       name : "free",
       is_pathable : true,
-      colour : "rgba(0, 0, 0, 0)"      
+      colour : "white"      
     },
     open : {
       name : "open",
@@ -66,7 +66,7 @@ var Tile = function() {
       colour : "red"    
     },
     closed : {
-      name : "closed",
+      name : "start",
       is_pathable : false,
       colour : "blue"    
     }
@@ -93,20 +93,11 @@ var Tile = function() {
   
   Tile.prototype.draw = function() {
 
-    // fill
-    ctx.fillStyle = this.tile_type.colour;
+    ctx.fillStyle = this.tile_type.colour;    
     ctx.fillRect(this.draw_x, this.draw_y, this.draw_w, this.draw_h);
-    ctx.lineWidth = 1;      
-
-    // outline
-    ctx.strokeStyle = "black";    
     if(cursor.tile === this) {
-      ctx.lineWidth = 3;
+      ctx.strokeRect(this.draw_x, this.draw_y, this.draw_w, this.draw_h);     
     }
-    else {
-      ctx.lineWidth = 1;      
-    }
-    ctx.strokeRect(this.draw_x, this.draw_y, this.draw_w, this.draw_h);      
 
     if(this.DEBUG) {
       ctx.fillText("" + this.col + "," + this.row, this.draw_x, this.draw_y + this.draw_h*0.5);
@@ -142,10 +133,9 @@ var Tile = function() {
   }
 
   Tile.prototype.is_neighbour_of = function(type, other) {
-    return true;
     var neighbours = _get_neighbours_from_type(this, type);
     for(var i = 0; i < neighbours.length; i++) {
-      var n = neighbours[indices[i]];
+      var n = neighbours[i];
       if(n && n.index === type.index) {
         return true;
       }
@@ -154,12 +144,7 @@ var Tile = function() {
 
   Tile.prototype.map_neighbours = function(type, f) {
     var neighbours = _get_neighbours_from_type(this, type);
-    
-    var indices = [];
-    for(var i = 0; i < neighbours.length; i++) {
-      indices[i] = i;
-    }
-    useful.shuffle(indices);
+    var indices = useful.get_random_order(neighbours.length);
 
     for(var i = 0; i < indices.length; i++) {
       var n = neighbours[indices[i]];

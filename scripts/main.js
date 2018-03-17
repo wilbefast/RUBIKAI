@@ -40,8 +40,8 @@ var main = function() {
   // ----------------------------------------------------------------------------
 
   grid = new Grid({
-    n_cols : 39,
-    n_rows : 39,
+    n_cols : 80,
+    n_rows : 40,
     tile_class : Tile
   });
 

@@ -26,6 +26,17 @@ var useful = function() {
     return array[Math.floor(Math.random() * (array.length - 1))];
   }
 
+  useful.get_random_order = function(length) {
+    var indices = new Array(length);
+    for(var i = 0; i < length; i++) {
+      indices[i] = i;
+    }
+
+    useful.shuffle(indices);
+
+    return indices;
+  }  
+
   useful.shuffle = function(array) {
     var currentIndex = array.length, temporaryValue, randomIndex ;
   

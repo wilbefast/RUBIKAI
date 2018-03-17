@@ -66,8 +66,25 @@ var ai = function() {
           }
         });
   
-        yield * babysitter.waitForNextFrame();     
+        // skip a frame every once and a while so we have time to see the maze creation progress
+        if(Math.random() > 0.9) {
+          yield * babysitter.waitForNextFrame();     
+        }
       };
+    }
+
+    // make some big open spaces
+    var room_count = Math.floor(7 + Math.random()*3);
+    for(var i = 0; i < room_count; i++) {
+      var size = Math.floor(3*(2 + Math.random()));
+      var room_middle = grid.get_random_tile();
+      grid.map_rectangle(room_middle.col - size/2, room_middle.row - size/2, size, size, function(tile) {
+        if(tile) {
+          tile.set_type("free");
+        }
+      });
+
+      yield * babysitter.waitForSeconds(0.2);           
     }
   }
   
