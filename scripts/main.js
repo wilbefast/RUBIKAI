@@ -39,6 +39,8 @@ var main = function() {
   // CREATE MAZE
   // ----------------------------------------------------------------------------
 
+  Math.seedrandom('To be or not to be, that is the question.');
+
   grid = new Grid({
     n_cols : 80,
     n_rows : 40,
@@ -46,6 +48,7 @@ var main = function() {
   });
 
   babysitter.add(ai.generate_maze);
+  babysitter.add(ai.spawn_player);
   
   // ----------------------------------------------------------------------------
   // MOUSE INPUT

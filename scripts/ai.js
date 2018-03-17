@@ -33,7 +33,7 @@ var ai = function() {
   
   var _claim_mutex = function*() {
     while(_mutex) {
-      return;
+      yield * babysitter.waitForNextFrame();     
     }
     _mutex = true;
   }
@@ -47,11 +47,34 @@ var ai = function() {
   }
 
   // ------------------------------------------------------------------------------------------
+  // PLAYER
+  // ------------------------------------------------------------------------------------------
+  
+  ai.spawn_player = function*() {
+    // lock mutex
+    yield * _claim_mutex();
+
+    // player has to spawn somewhere free, surrounded on all sides by free tiles
+    var player_tile = grid.get_random_tile(function(tile) {
+      return tile.is_type("free") && tile.all_neighbours("8", function(n) {
+        return n.is_type("free");
+      });
+    });
+    useful.assert(player_tile, "there must be a tile for the player to spawn on");
+    player_tile.set_type("player");
+
+    // remember the player position
+    _player_tile = player_tile;
+
+    // all done
+    yield * _release_mutex();
+  }
+
+  // ------------------------------------------------------------------------------------------
   // MAZE
   // ------------------------------------------------------------------------------------------
   
   ai.generate_maze = function*() {
-    
     // lock mutex
     yield * _claim_mutex();
 
@@ -94,8 +117,8 @@ var ai = function() {
         });
   
         // skip a frame every once and a while so we have time to see the maze creation progress
-        if(Math.random() > 0.95) {
-          //yield * babysitter.waitForNextFrame();     
+        if(Math.random() > 0.99) {
+          yield * babysitter.waitForNextFrame();     
         }
       };
     }
@@ -111,22 +134,8 @@ var ai = function() {
         }
       });
 
-      //yield * babysitter.waitForSeconds(0.2);           
+      yield * babysitter.waitForSeconds(0.1);           
     }
-
-    // place the player character
-    //yield * babysitter.waitForSeconds(0.5);               
-    var player_tile = grid.get_random_tile(function(tile) {
-      // player has to spawn somewhere free, surrounded on all sides by free tiles
-      return tile.is_type("free") && tile.all_neighbours("X", function(n) {
-        return n.is_type("free");
-      });
-    });
-    useful.assert(player_tile, "there must be a tile for the player to spawn on");
-    player_tile.set_type("player");
-
-    // remember the player position
-    _player_tile = player_tile;
 
     // all done
     yield * _release_mutex();    

@@ -1,0 +1,3 @@
+[submodule "scripts/seedrandom"]
+	path = scripts/seedrandom
+	url = https://github.com/davidbau/seedrandom
