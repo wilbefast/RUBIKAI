@@ -48,6 +48,7 @@ var Grid = function() {
           });
           var index = col + this.n_cols*row; 
           this.tiles[index] = tile;
+          tile.hash = index;
         }
       }
 
@@ -69,7 +70,7 @@ var Grid = function() {
           tile.NE = this.grid_to_tile(tile.col + 1, tile.row - 1);
           tile.SE = this.grid_to_tile(tile.col + 1, tile.row + 1);
           tile.NW = this.grid_to_tile(tile.col - 1, tile.row - 1);
-          tile.SW = this.grid_to_tile(tile.col - 1, tile.row - 1);
+          tile.SW = this.grid_to_tile(tile.col - 1, tile.row + 1);
           tile.neighboursX = [
             tile.NE,
             tile.SE,
@@ -152,7 +153,7 @@ var Grid = function() {
       }
     };
 
-    Grid.prototype.mapc = function*(c) {
+    Grid.prototype.map_coroutine = function*(c) {
       for(var i = 0; i < this.tiles.length; i++) {
         var tile = this.tiles[i];
         var result = yield * c(tile);

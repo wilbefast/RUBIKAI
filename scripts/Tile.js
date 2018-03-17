@@ -35,7 +35,7 @@ var Tile = function() {
 
     // type
     this.tile_type = this.tile_types.free;
-
+    
     // done
     return this;
   }
@@ -59,6 +59,16 @@ var Tile = function() {
       name : "free",
       is_pathable : true,
       colour : "rgba(0, 0, 0, 0)"      
+    },
+    open : {
+      name : "open",
+      is_pathable : false,
+      colour : "red"    
+    },
+    closed : {
+      name : "closed",
+      is_pathable : false,
+      colour : "blue"    
     }
   }
 
@@ -102,9 +112,77 @@ var Tile = function() {
       ctx.fillText("" + this.col + "," + this.row, this.draw_x, this.draw_y + this.draw_h*0.5);
     }
   };
+
+  // ------------------------------------------------------------------------------------------
+  // UPDATE
+  // ------------------------------------------------------------------------------------------
+  
   
   Tile.prototype.update = function(dt) {
   };
+
+  // ------------------------------------------------------------------------------------------
+  // QUERY
+  // ------------------------------------------------------------------------------------------
+  
+  var _get_neighbours_from_type = function(tile, type) {
+    if(type == "4") {
+      return tile.neighbours4;
+    }
+    else if(type == "8") {
+      return tile.neighbours8;
+    }
+    else if (type === "X" || type === "x" || type === "*") {
+      return tile.neighboursX;
+    }
+    else {
+      console.error("Invalid neighbours type, must be 4, 8 or X");
+      return nil;
+    }
+  }
+
+  Tile.prototype.is_neighbour_of = function(type, other) {
+    return true;
+    var neighbours = _get_neighbours_from_type(this, type);
+    for(var i = 0; i < neighbours.length; i++) {
+      var n = neighbours[indices[i]];
+      if(n && n.index === type.index) {
+        return true;
+      }
+    }    
+  }
+
+  Tile.prototype.map_neighbours = function(type, f) {
+    var neighbours = _get_neighbours_from_type(this, type);
+    
+    var indices = [];
+    for(var i = 0; i < neighbours.length; i++) {
+      indices[i] = i;
+    }
+    useful.shuffle(indices);
+
+    for(var i = 0; i < indices.length; i++) {
+      var n = neighbours[indices[i]];
+      if(n) {
+        var result = f(n);
+        if(result) {
+          return result;
+        }
+      }
+    }
+  }
+
+  Tile.prototype.any_neighbours = function(type, f) {
+    return this.map_neighbours(type, function(n) {
+      return f(n);
+    });
+  }
+
+  Tile.prototype.all_neighbours = function(type, f) {
+    return !this.map_neighbours(type, function(n) {
+      return !f(n);
+    });
+  }
 
   // ------------------------------------------------------------------------------------------
   // EXPORT
