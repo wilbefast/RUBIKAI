@@ -40,10 +40,12 @@ var main = function() {
   // ----------------------------------------------------------------------------
 
   grid = new Grid({
-    n_cols : 10,
-    n_rows : 10,
+    n_cols : 39,
+    n_rows : 39,
     tile_class : Tile
   });
+
+  babysitter.add(ai.generate_maze, grid);
   
   // ----------------------------------------------------------------------------
   // MOUSE INPUT
@@ -87,10 +89,6 @@ var main = function() {
 
   function draw() {
     // render the game to the source canvas
-    ctx.imageSmoothingEnabled       = false;
-    ctx.mozImageSmoothingEnabled    = false;
-    ctx.msImageSmoothingEnabled     = false;
-    ctx.oImageSmoothingEnabled      = false;
     var can = ctx.canvas
     ctx.clearRect(0, 0, can.width, can.height);
 
@@ -102,10 +100,6 @@ var main = function() {
     ctx.restore();
 
     // scale and copy to the destination canvas
-    dest_ctx.imageSmoothingEnabled       = false;
-    dest_ctx.mozImageSmoothingEnabled    = false;
-    dest_ctx.msImageSmoothingEnabled     = false;
-    dest_ctx.oImageSmoothingEnabled      = false;
     var dest_can = dest_ctx.canvas
     dest_ctx.clearRect(0, 0, dest_can.width, dest_can.height);   
     dest_ctx.save();

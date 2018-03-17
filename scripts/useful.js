@@ -22,6 +22,10 @@ var useful = function() {
 
   var useful = {};
 
+  useful.rand_in = function(array) {
+    return array[Math.floor(Math.random() * (array.length - 1))];
+  }
+
   useful.shuffle = function(array) {
     var currentIndex = array.length, temporaryValue, randomIndex ;
   
@@ -38,6 +42,14 @@ var useful = function() {
     }
     
     return array;
+  }
+
+  useful.assert = function(predicate, message) {
+    if(!predicate) {
+      console.error(message);
+    }
+
+    return predicate;
   }
 
   useful.assert_keys_exist = function(object, keys) {

@@ -23,9 +23,9 @@ var babysitter = function() {
     coroutines : []
   }
   
-  babysitter.add = function(c) {
+  babysitter.add = function(c, args) {
     // add a new coroutine to be "babysat"
-    babysitter.coroutines.push(c());
+    babysitter.coroutines.push(c(args));
   }
   
   babysitter.clear = function() {
@@ -45,6 +45,10 @@ var babysitter = function() {
       dt = yield undefined;
     }
     return dt;
+  }
+
+  babysitter.waitForNextFrame = function* () {
+    yield undefined;
   }
   
   babysitter.addWaitForSeconds = function(duration_s) {

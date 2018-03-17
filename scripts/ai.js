@@ -12,57 +12,36 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 Lesser General Public License for more details.
 */
 
+// ----------------------------------------------------------------------------
+// COROUTINE MANAGER
+// ----------------------------------------------------------------------------
+
 "use strict";
 
-// ----------------------------------------------------------------------------
-// CURSOR MANAGER
-// ----------------------------------------------------------------------------
-
-var cursor = function() {
-  var cursor = {
-    x : 0,
-    y : 0,
-    allow_input : true
-  }
-  
-  cursor.move_to = function(x, y) {
-    cursor.x = x;
-    cursor.y = y;
-    
-    if(!cursor.allow_input) {
-      return;
-    }
-    
-    // hover over tiles
-    var new_tile = grid.pixel_to_tile(cursor.x, cursor.y);
-  
-    if(new_tile != cursor.tile) {
-      cursor.tile = new_tile;
-    }
-  }
-  
-  cursor.left_click = function() {
-    if(!cursor.allow_input) {
-      return;
-    }
-  }
-  
-  cursor.right_click = function(shiftHeld) {
-    if(!cursor.allow_input) {
-      return;
-    }
-  }
-
-  cursor.draw = function() {
-    if(cursor.DEBUG) {
-      ctx.fillStyle = "white";
-      ctx.fillRect(cursor.x - 4, cursor.y - 4, 8, 8)    
-    }
+var ai = function() {
+  var ai = {
   }
 
   // ------------------------------------------------------------------------------------------
   // EXPORT
   // ------------------------------------------------------------------------------------------
+  
+  ai.generate_maze = function*(grid) {
 
-  return cursor;
+    // set all tiles to "wall"
+    yield * grid.mapc(function*(tile) {
+      tile.set_type("wall");
+      //yield * babysitter.waitForNextFrame();         
+    });
+
+    // pick random starting tile
+    var start_tile = grid.get_random_tile();
+    start_tile.set_type("free");
+  }
+  
+  // ------------------------------------------------------------------------------------------
+  // EXPORT
+  // ------------------------------------------------------------------------------------------
+  
+  return ai;
 }();

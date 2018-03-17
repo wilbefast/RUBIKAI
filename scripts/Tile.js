@@ -33,26 +33,70 @@ var Tile = function() {
     this.draw_x = this.grid.draw_x + this.col*this.draw_w;
     this.draw_y = this.grid.draw_y + this.row*this.draw_h;
 
+    // type
+    this.tile_type = this.tile_types.free;
+
     // done
     return this;
   }
 
-  Tile.prototype.draw_w = 32;
-  Tile.prototype.draw_h = 32;
+  Tile.prototype.draw_w = 16;
+  Tile.prototype.draw_h = 16;
 
-  Tile.prototype.DEBUG = true;
+  //Tile.prototype.DEBUG = true;
+
+  // ------------------------------------------------------------------------------------------
+  // TYPES
+  // ------------------------------------------------------------------------------------------
+  
+  Tile.prototype.tile_types = {
+    wall : {
+      name : "wall",
+      is_pathable : false,
+      colour : "#003f34"
+    },
+    free : {
+      name : "free",
+      is_pathable : true,
+      colour : "rgba(0, 0, 0, 0)"      
+    }
+  }
+
+  Tile.prototype.set_type = function(type_name) {
+    var tile_type = this.tile_types[type_name];
+    if(useful.assert(tile_type, type_name + " must be a valid type")) {
+      this.tile_type = tile_type;
+    }
+  }
+
+  Tile.prototype.is_type = function(type_name) {
+    return this.tile_type.name === type_name
+  }
+
+  Tile.prototype.is_pathable = function() {
+    return this.tile_type.is_pathable;
+  }
 
   // ------------------------------------------------------------------------------------------
   // UPDATE
   // ------------------------------------------------------------------------------------------
   
   Tile.prototype.draw = function() {
+
+    // fill
+    ctx.fillStyle = this.tile_type.colour;
+    ctx.fillRect(this.draw_x, this.draw_y, this.draw_w, this.draw_h);
+    ctx.lineWidth = 1;      
+
+    // outline
+    ctx.strokeStyle = "black";    
     if(cursor.tile === this) {
-      ctx.fillRect(this.draw_x, this.draw_y, this.draw_w, this.draw_h);
+      ctx.lineWidth = 3;
     }
     else {
-      ctx.strokeRect(this.draw_x, this.draw_y, this.draw_w, this.draw_h);      
+      ctx.lineWidth = 1;      
     }
+    ctx.strokeRect(this.draw_x, this.draw_y, this.draw_w, this.draw_h);      
 
     if(this.DEBUG) {
       ctx.fillText("" + this.col + "," + this.row, this.draw_x, this.draw_y + this.draw_h*0.5);

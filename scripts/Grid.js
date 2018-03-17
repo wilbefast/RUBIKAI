@@ -138,10 +138,24 @@ var Grid = function() {
     // QUERY
     // ------------------------------------------------------------------------------------------
     
+    Grid.prototype.get_random_tile = function() {
+      return useful.rand_in(this.tiles);
+    }
+
     Grid.prototype.map = function(f) {
       for(var i = 0; i < this.tiles.length; i++) {
         var tile = this.tiles[i];
         var result = f(tile);
+        if(result) {
+          return result;
+        }
+      }
+    };
+
+    Grid.prototype.mapc = function*(c) {
+      for(var i = 0; i < this.tiles.length; i++) {
+        var tile = this.tiles[i];
+        var result = yield * c(tile);
         if(result) {
           return result;
         }
@@ -192,9 +206,9 @@ var Grid = function() {
       return lowest_value_tile;
     };
 
-  // ------------------------------------------------------------------------------------------
-  // EXPORT
-  // ------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------
+    // EXPORT
+    // ------------------------------------------------------------------------------------------
 
     return Grid;
 }();
