@@ -45,6 +45,10 @@ var cursor = function() {
     if(!cursor.allow_input) {
       return;
     }
+
+    if(cursor.tile && !ai.is_busy()) {
+      babysitter.add(ai.move_to, cursor.tile);
+    }
   }
   
   cursor.right_click = function(shiftHeld) {

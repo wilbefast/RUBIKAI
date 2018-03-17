@@ -57,17 +57,22 @@ var Tile = function() {
     },
     free : {
       name : "free",
-      is_pathable : true,
       colour : "white"      
     },
     open : {
       name : "open",
-      is_pathable : false,
       colour : "red"    
     },
     closed : {
-      name : "start",
-      is_pathable : false,
+      name : "closed",
+      colour : "yellow"    
+    },
+    path : {
+      name : "path",
+      colour : "violet"
+    },
+    player : {
+      name : "player",
       colour : "blue"    
     }
   }
@@ -167,6 +172,10 @@ var Tile = function() {
     return !this.map_neighbours(type, function(n) {
       return !f(n);
     });
+  }
+
+  Tile.prototype.distance_to = function(other_tile) {
+    return vector.dist(this.col, this.row, other_tile.col, other_tile.row);
   }
 
   // ------------------------------------------------------------------------------------------

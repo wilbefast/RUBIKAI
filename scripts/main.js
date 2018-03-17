@@ -36,7 +36,7 @@ var main = function() {
   dest_ctx.off_y = 0;
 
   // ----------------------------------------------------------------------------
-  // CREATE GRID
+  // CREATE MAZE
   // ----------------------------------------------------------------------------
 
   grid = new Grid({
@@ -45,7 +45,7 @@ var main = function() {
     tile_class : Tile
   });
 
-  babysitter.add(ai.generate_maze, grid);
+  babysitter.add(ai.generate_maze);
   
   // ----------------------------------------------------------------------------
   // MOUSE INPUT

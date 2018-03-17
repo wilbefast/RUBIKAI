@@ -19,14 +19,41 @@ Lesser General Public License for more details.
 "use strict";
 
 var ai = function() {
+  
   var ai = {
   }
 
+  var _player_tile = null;
+  
   // ------------------------------------------------------------------------------------------
-  // EXPORT
+  // MUTEX
   // ------------------------------------------------------------------------------------------
   
-  ai.generate_maze = function*(grid) {
+  var _mutex = false;
+  
+  var _claim_mutex = function*() {
+    while(_mutex) {
+      return;
+    }
+    _mutex = true;
+  }
+
+  var _release_mutex = function*() {
+    _mutex = false;
+  }
+
+  ai.is_busy = function() {
+    return _mutex;
+  }
+
+  // ------------------------------------------------------------------------------------------
+  // MAZE
+  // ------------------------------------------------------------------------------------------
+  
+  ai.generate_maze = function*() {
+    
+    // lock mutex
+    yield * _claim_mutex();
 
     // set all tiles to "wall"
     yield * grid.map_coroutine(function*(tile) {
@@ -59,7 +86,7 @@ var ai = function() {
         tile.map_neighbours("4", function(neighbour) {
           // only open tiles which do not already have adjacent opened tiles
           if(neighbour.all_neighbours("4", function(n) {
-            return n.hash === tile.hash || n.is_type("wall");
+            return n === tile || n.is_type("wall");
           })) {
             neighbour.set_type("open");
             open.push(neighbour);
@@ -67,8 +94,8 @@ var ai = function() {
         });
   
         // skip a frame every once and a while so we have time to see the maze creation progress
-        if(Math.random() > 0.9) {
-          yield * babysitter.waitForNextFrame();     
+        if(Math.random() > 0.95) {
+          //yield * babysitter.waitForNextFrame();     
         }
       };
     }
@@ -84,8 +111,130 @@ var ai = function() {
         }
       });
 
-      yield * babysitter.waitForSeconds(0.2);           
+      //yield * babysitter.waitForSeconds(0.2);           
     }
+
+    // place the player character
+    //yield * babysitter.waitForSeconds(0.5);               
+    var player_tile = grid.get_random_tile(function(tile) {
+      // player has to spawn somewhere free, surrounded on all sides by free tiles
+      return tile.is_type("free") && tile.all_neighbours("X", function(n) {
+        return n.is_type("free");
+      });
+    });
+    useful.assert(player_tile, "there must be a tile for the player to spawn on");
+    player_tile.set_type("player");
+
+    // remember the player position
+    _player_tile = player_tile;
+
+    // all done
+    yield * _release_mutex();    
+  }
+
+  // ------------------------------------------------------------------------------------------
+  // A STAR
+  // ------------------------------------------------------------------------------------------
+  
+  ai.move_to = function*(destination_tile) {
+    yield * _claim_mutex();
+
+    // in order to move, we'll need a path to follow
+    var path = [];
+
+    // to calculate the path we'll need to store some per-tile values, like their cost
+    // but for this implementation I'm storing them inside the tile objects for simplicity
+    // a cleaner implementation would encapsulate the tiles within a "path state" object
+    _player_tile.current_cost = 0;
+    _player_tile.estimated_total_cost = _player_tile.distance_to(destination_tile); 
+    var open = [ _player_tile ];
+    _player_tile.set_type("open");
+
+    while(open.length > 0) {
+      var tile = open.shift();
+
+      // have we reached our destination ?
+      if(tile === destination_tile) {
+        // read back the path
+        while(tile) {
+          tile.set_type("path");
+          path.unshift(tile);
+          tile = tile.previous;
+          yield * babysitter.waitForNextFrame();           
+        }
+
+        // time to stop
+        open.length = 0;
+      }
+      else {
+        tile.map_neighbours("4", function(n) {
+          if(n.is_type("wall")) {
+            // impassible tile
+            return;
+          }
+          else {
+            var estimated_remaining_cost = n.estimated_remaining_cost || n.distance_to(destination_tile);
+            var new_estimated_total_cost = tile.current_cost + 1 + n.distance_to(destination_tile);
+            
+            var change_previous = false;
+
+            if(n.is_type("free")) {
+              // new tile that has not yet been examined
+              change_previous = true;
+              n.set_type("open");
+              open.push(n);
+            }
+            else if(n.is_type("open")) {
+              // tile that was previously examined, but this path might be better
+              change_previous = (new_estimated_total_cost < n.estimated_total_cost); 
+            }
+
+            if(change_previous) {
+              n.previous = tile;
+              n.current_cost = tile.current_cost + 1;
+              n.estimated_remaining_cost = estimated_remaining_cost;
+              n.estimated_total_cost = new_estimated_total_cost; 
+            }
+          }
+        });
+
+        // make sure we don't explore things twice
+        tile.set_type("closed");
+      }
+
+      // this sorting is the key: we explore the most promising frontiers first
+      open.sort(function(a, b) {
+        return (a.estimated_remaining_cost - b.estimated_remaining_cost);
+      });
+
+      // skip a frame so the we can see the path being calculated in real time
+      yield * babysitter.waitForNextFrame();           
+    }
+
+    // clean up
+    grid.map(function(tile) {
+      if(!tile.is_type("wall")) {
+        delete tile.previous
+        delete tile.current_cost
+        delete tile.estimated_total_cost
+        delete tile.estimated_remaining_cost
+        if(!tile.is_type("path")) {
+          tile.set_type("free");
+        }
+      }
+    });
+    _player_tile.set_type("player");
+
+    // follow path
+    while(path.length > 0) {
+      _player_tile.set_type("free");
+      _player_tile = path.shift();
+      _player_tile.set_type("player");
+      yield * babysitter.waitForSeconds(0.05);      
+    }
+
+    // all done
+    yield * _release_mutex(); 
   }
   
   // ------------------------------------------------------------------------------------------
