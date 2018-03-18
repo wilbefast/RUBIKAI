@@ -68,13 +68,13 @@ var Tile = function() {
       name : "path",
       colour : "tan"
     },
-    player : {
-      name : "player",
-      colour : "blue"    
+    red_player : {
+      name : "red_player",
+      colour : "red"    
     },
-    enemy : {
-      name : "enemy",
-      colour : "red"      
+    blue_player : {
+      name : "blue_player",
+      colour : "blue"      
     }
   }
 

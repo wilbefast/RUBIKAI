@@ -227,6 +227,18 @@ var Grid = function() {
       return lowest_value_tile;
     };
 
+    Grid.prototype.count = function(f) {
+      var count = 0;
+      for(var i = 0; i < this.tiles.length; i++) {
+        var tile = this.tiles[i];
+        if(f(tile)) {
+          count++;
+        }
+      }
+
+      return count;
+    };
+
     // ------------------------------------------------------------------------------------------
     // EXPORT
     // ------------------------------------------------------------------------------------------

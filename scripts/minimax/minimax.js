@@ -27,10 +27,10 @@ var minimax = function() {
   // REVERSI GAME RULES
   // ------------------------------------------------------------------------------------------
   
-  var _current_player = "player";
+  var _current_player = "red_player";
   var _other_player = {
-    player : "enemy",
-    enemy : "player"
+    red_player : "blue_player",
+    blue_player : "red_player"
   }
 
   var _try_flip_line = function(start_tile, dcol, drow) {
@@ -58,17 +58,39 @@ var minimax = function() {
     }
 
     // only flip the encountered enemy tiles if we found a friend
-    if(found_friend) {
+    if(found_friend && enemies.length > 0) {
       for(var i = 0; i < enemies.length; i++) {
         enemies[i].set_type(_current_player);
       }
+
+      // success!
+      return true;
     }
+    else {
+      // couldn't flip anything
+      return false;
+    }
+  }
+
+  var _try_flip_any_line = function(tile) {
+    var success = false;
+    success =_try_flip_line(tile,  0,  1) || success;
+    success =_try_flip_line(tile,  0, -1) || success;
+    success =_try_flip_line(tile,  1,  0) || success;
+    success =_try_flip_line(tile, -1,  0) || success;
+    success =_try_flip_line(tile,  1,  1) || success;
+    success =_try_flip_line(tile, -1,  1) || success;
+    success =_try_flip_line(tile,  1, -1) || success;
+    success =_try_flip_line(tile, -1, -1) || success;
+
+    return success;
   }
 
   minimax.place_piece = function*(tile) {
     yield * mutex.claim();
 
-    if(!tile.is_type("free")) {
+    // check that this is a legal move
+    if(!tile.is_type("free") || !_try_flip_any_line(tile)) {
       console.warn("invalid move", tile.col, tile.row);
       yield * mutex.release();
       return;
@@ -77,15 +99,27 @@ var minimax = function() {
     // place the piece
     tile.set_type(_current_player);
 
-    // try to flip enemy pieces
-    _try_flip_line(tile,  0,  1);
-    _try_flip_line(tile,  0, -1);
-    _try_flip_line(tile,  1,  0);
-    _try_flip_line(tile, -1,  0);
-    _try_flip_line(tile,  1,  1);
-    _try_flip_line(tile, -1,  1);
-    _try_flip_line(tile,  1, -1);
-    _try_flip_line(tile, -1, -1);
+    // check for end of game
+    if(!grid.map(function(tile) {
+      return tile.is_type("free")
+    })) {
+      var blue_score = grid.count(function(tile) {
+        return tile.is_type("blue_player");
+      })
+      var red_score = grid.count(function(tile) {
+        return tile.is_type("red_player")
+      })
+
+      if(blue_score > red_score) {
+        console.log("blue player wins", blue_score, "to", red_score);  
+      }
+      else if(red_score > blue_score) {
+        console.log("red player wins", red_score, "to", blue_score);  
+      }
+      else {
+        console.log("draw", red_score, "to", blue_score);
+      }
+    }
 
     // next player's turn
     _current_player = _other_player[_current_player];

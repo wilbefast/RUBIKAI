@@ -37,10 +37,10 @@ var mode_minimax = function() {
     });
 
     // place the initial pieces
-    babysitter.add(minimax.place_piece, grid.grid_to_tile(3, 3));
-    babysitter.add(minimax.place_piece, grid.grid_to_tile(4, 3));
-    babysitter.add(minimax.place_piece, grid.grid_to_tile(4, 4));
-    babysitter.add(minimax.place_piece, grid.grid_to_tile(3, 4));
+    grid.grid_to_tile(3, 3).set_type("red_player");
+    grid.grid_to_tile(4, 3).set_type("blue_player");
+    grid.grid_to_tile(4, 4).set_type("red_player");
+    grid.grid_to_tile(3, 4).set_type("blue_player");
   }
 
   mode_minimax.left_click = function(tile) {

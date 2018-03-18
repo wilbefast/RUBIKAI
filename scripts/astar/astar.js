@@ -40,7 +40,7 @@ var astar = function() {
       });
     });
     useful.assert(player_tile, "there must be a tile for the player to spawn on");
-    player_tile.set_type("player");
+    player_tile.set_type("blue_player");
 
     // remember the player position
     _player_tile = player_tile;
@@ -217,13 +217,13 @@ var astar = function() {
         }
       }
     });
-    _player_tile.set_type("player");
+    _player_tile.set_type("blue_player");
 
     // follow path
     while(path.length > 0) {
       _player_tile.set_type("free");
       _player_tile = path.shift();
-      _player_tile.set_type("player");
+      _player_tile.set_type("blue_player");
       yield * babysitter.waitForSeconds(0.05);      
     }
 
