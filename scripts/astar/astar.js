@@ -13,46 +13,25 @@ Lesser General Public License for more details.
 */
 
 // ----------------------------------------------------------------------------
-// COROUTINE MANAGER
+// MAZE GENERATION AND A* IMPLEMENTATION
 // ----------------------------------------------------------------------------
 
 "use strict";
 
-var ai = function() {
+var astar = function() {
   
-  var ai = {
+  var astar = {
   }
 
   var _player_tile = null;
-  
-  // ------------------------------------------------------------------------------------------
-  // MUTEX
-  // ------------------------------------------------------------------------------------------
-  
-  var _mutex = false;
-  
-  var _claim_mutex = function*() {
-    while(_mutex) {
-      yield * babysitter.waitForNextFrame();     
-    }
-    _mutex = true;
-  }
-
-  var _release_mutex = function*() {
-    _mutex = false;
-  }
-
-  ai.is_busy = function() {
-    return _mutex;
-  }
 
   // ------------------------------------------------------------------------------------------
   // PLAYER
   // ------------------------------------------------------------------------------------------
   
-  ai.spawn_player = function*() {
+  astar.spawn_player = function*() {
     // lock mutex
-    yield * _claim_mutex();
+    yield * mutex.claim();
 
     // player has to spawn somewhere free, surrounded on all sides by free tiles
     var player_tile = grid.get_random_tile(function(tile) {
@@ -67,16 +46,16 @@ var ai = function() {
     _player_tile = player_tile;
 
     // all done
-    yield * _release_mutex();
+    yield * mutex.release();
   }
 
   // ------------------------------------------------------------------------------------------
   // MAZE
   // ------------------------------------------------------------------------------------------
   
-  ai.generate_maze = function*() {
+  astar.generate_maze = function*() {
     // lock mutex
-    yield * _claim_mutex();
+    yield * mutex.claim();
 
     // set all tiles to "wall"
     yield * grid.map_coroutine(function*(tile) {
@@ -138,15 +117,21 @@ var ai = function() {
     }
 
     // all done
-    yield * _release_mutex();    
+    yield * mutex.release();    
   }
 
   // ------------------------------------------------------------------------------------------
   // A STAR
   // ------------------------------------------------------------------------------------------
   
-  ai.move_to = function*(destination_tile) {
-    yield * _claim_mutex();
+  astar.move_to = function*(destination_tile) {
+    yield * mutex.claim();
+
+    if(!destination_tile.is_type("free")) {
+      console.log("invalid destination", destination_tile.col, destination_tile.row);
+      yield * mutex.release();
+      return;
+    }
 
     // in order to move, we'll need a path to follow
     var path = [];
@@ -243,12 +228,12 @@ var ai = function() {
     }
 
     // all done
-    yield * _release_mutex(); 
+    yield * mutex.release(); 
   }
   
   // ------------------------------------------------------------------------------------------
   // EXPORT
   // ------------------------------------------------------------------------------------------
   
-  return ai;
+  return astar;
 }();

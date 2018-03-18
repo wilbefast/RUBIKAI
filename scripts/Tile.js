@@ -25,11 +25,11 @@ var Tile = function() {
   // ------------------------------------------------------------------------------------------
 
   var Tile = function(args) {
-    
+
     // check parameters
-    useful.copy_entries(args, this, [ "grid", "row", "col" ]);
+    useful.copy_entries(args, this, [ "grid", "row", "col", "draw_w", "draw_h" ]);
     
-    // draw position
+    // rendering
     this.draw_x = this.grid.draw_x + this.col*this.draw_w;
     this.draw_y = this.grid.draw_y + this.row*this.draw_h;
 
@@ -39,9 +39,6 @@ var Tile = function() {
     // done
     return this;
   }
-
-  Tile.prototype.draw_w = 16;
-  Tile.prototype.draw_h = 16;
 
   //Tile.prototype.DEBUG = true;
 
@@ -61,7 +58,7 @@ var Tile = function() {
     },
     open : {
       name : "open",
-      colour : "red"    
+      colour : "lime"    
     },
     closed : {
       name : "closed",
@@ -69,11 +66,15 @@ var Tile = function() {
     },
     path : {
       name : "path",
-      colour : "violet"
+      colour : "tan"
     },
     player : {
       name : "player",
       colour : "blue"    
+    },
+    enemy : {
+      name : "enemy",
+      colour : "red"      
     }
   }
 
@@ -86,10 +87,6 @@ var Tile = function() {
 
   Tile.prototype.is_type = function(type_name) {
     return this.tile_type.name === type_name
-  }
-
-  Tile.prototype.is_pathable = function() {
-    return this.tile_type.is_pathable;
   }
 
   // ------------------------------------------------------------------------------------------

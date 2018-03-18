@@ -27,11 +27,9 @@ var Grid = function() {
     var Grid = function(args) {
 
       // check parameters
-      useful.copy_entries(args, this, [ "n_cols", "n_rows", "tile_class" ]);
+      useful.copy_entries(args, this, [ "n_cols", "n_rows", "tile_class", "tile_draw_w", "tile_draw_h" ]);
       
       // rendering
-      this.tile_draw_w = this.tile_class.prototype.draw_w;
-      this.tile_draw_h = this.tile_class.prototype.draw_h;
       this.draw_w = this.n_cols*this.tile_draw_w;
       this.draw_h = this.n_rows*this.tile_draw_h;
       this.draw_x = (ctx.canvas.width - this.draw_w)*0.5;
@@ -44,7 +42,9 @@ var Grid = function() {
           var tile = new this.tile_class({
             grid : this,
             col : col,
-            row : row
+            row : row,
+            draw_w : this.tile_draw_w,
+            draw_h : this.tile_draw_h
           });
           var index = col + this.n_cols*row; 
           this.tiles[index] = tile;

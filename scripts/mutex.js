@@ -12,49 +12,37 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 Lesser General Public License for more details.
 */
 
+// ----------------------------------------------------------------------------
+// MUTAL EXCLUSION LOCK
+// ----------------------------------------------------------------------------
+
 "use strict";
 
-// ----------------------------------------------------------------------------
-// MAIN LOOP FOR MAZE GENERATION AND A* DEMO
-// ----------------------------------------------------------------------------
+var mutex = function() {
+  
+  var mutex = {};
 
-var mode_astar = function() {
-  var mode_astar = {
-  }
-
-  mode_astar.init = function() {
-
-    // set random seed, for easier debugging
-    Math.seedrandom('To be or not to be, that is the question.');
-
-    // create a nice big grid
-    grid = new Grid({
-      n_cols : 80,
-      n_rows : 40,
-      tile_class : Tile
-    });
-
-    // create a maze
-    babysitter.add(ai.generate_maze);
-
-    // spawn the player
-    babysitter.add(ai.spawn_player);
-  }
-
-  mode_astar.left_click = function(tile) {
-    // calculate path for player
-    if(!ai.is_busy() && tile.is_type("free")) {
-      babysitter.add(ai.move_to, tile);
+  // in case you're wondering, this is how I do do private fields in Javascript
+  var _is_locked = false;
+  
+  mutex.claim = function*() {
+    while(_is_locked) {
+      yield * babysitter.waitForNextFrame();     
     }
+    _is_locked = true;
   }
 
-  mode_astar.right_click = function(tile) {
-    // right click is not bound to anything
+  mutex.release = function*() {
+    _is_locked = false;
   }
 
+  mutex.is_locked = function() {
+    return _is_locked;
+  }
+  
   // ------------------------------------------------------------------------------------------
   // EXPORT
   // ------------------------------------------------------------------------------------------
-
-  return mode_astar;
+  
+  return mutex;
 }();

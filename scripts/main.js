@@ -41,7 +41,8 @@ var main = function() {
   // FIGURE OUT WHICH MODE WE'RE RUNNING
   // ----------------------------------------------------------------------------
 
-  mode = mode_astar;
+  //mode = mode_astar;
+  mode = mode_minimax;
 
   // ----------------------------------------------------------------------------
   // DO WHATEVER SETUP THIS MODE REQUIRES
