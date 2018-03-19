@@ -36,12 +36,10 @@ var mode_minimax = function() {
       tile_draw_h : 70
     });
 
-    // place the initial pieces
-    babysitter.add(minimax.init);
-
-    // let the AI play the game
+    // play some reversi
     babysitter.add(minimax.play, {
       verbose : false,
+      matches : 100,
       red_player : "random",
       blue_player : "heuristic"
     });

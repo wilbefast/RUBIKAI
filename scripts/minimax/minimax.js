@@ -37,6 +37,26 @@ var minimax = function() {
   // REVERSI GAME RULES
   // ------------------------------------------------------------------------------------------
   
+  var _init = function() {
+    // clean up
+    _current_player = "red_player";
+    grid.map(function(tile) {
+      tile.set_type("free");
+    });
+
+    // set the board
+    grid.grid_to_tile(3, 3).set_type("red_player");
+    grid.grid_to_tile(4, 3).set_type("blue_player");
+    grid.grid_to_tile(4, 4).set_type("red_player");
+    grid.grid_to_tile(3, 4).set_type("blue_player");
+
+    // mark initial options
+    var options = _get_options(grid, _current_player);
+    for(var i = 0; i < options.length; i++) {
+      options[i].set_type("open");
+    }
+  }
+
   var _try_flip_line = function(start_tile, dcol, drow, player, is_dry_run) {
     useful.assert(start_tile, "a starting tile must be specified");
     useful.assert(player, "a player must be specified");
@@ -255,118 +275,114 @@ var minimax = function() {
   // ------------------------------------------------------------------------------------------
   // PUBLIC FUNCTIONS
   // ------------------------------------------------------------------------------------------
-  
-  minimax.init = function*(player) {
-    yield * mutex.claim();
-
-    // clean up
-    _current_player = "red_player";
-    grid.map(function(tile) {
-      tile.set_type("free");
-    });
-
-    // set the board
-    grid.grid_to_tile(3, 3).set_type("red_player");
-    grid.grid_to_tile(4, 3).set_type("blue_player");
-    grid.grid_to_tile(4, 4).set_type("red_player");
-    grid.grid_to_tile(3, 4).set_type("blue_player");
-
-    // mark initial options
-    var options = _get_options(grid, _current_player);
-    for(var i = 0; i < options.length; i++) {
-      options[i].set_type("open");
-    }
-
-    // all done
-    yield * mutex.release(); 
-  }
 
   minimax.play = function*(args) {
-    // check parameters for blue player
+    // check parameters
     var controllers = {}
     controllers.blue_player = _controllers[args.blue_player];
     useful.assert(controllers.blue_player, "there must be valid parameters for the blue player");
     controllers.red_player = _controllers[args.red_player];
     useful.assert(controllers.red_player, "there must be valid parameters for the red player");
 
-    // play until the game is over
-    while(!_is_game_over(grid)) {
-      
-      // should we play for the current player?
-      var current_player_controller = controllers[_current_player];
-      if(!current_player_controller.is_ai) {
-        // check again in 1 second
-        yield * babysitter.waitForSeconds(1);                 
+    useful.assert(args.matches === undefined || (!isNaN(parseFloat(args.matches)) && isFinite(args.matches)), "matches must be a whole number");
+    var matches = args.matches || 1;
+    var victories = {
+      red_player : 0,
+      blue_player : 0
+    }
+
+    yield * babysitter.waitForNextFrame();                               
+    for(var match_i = 0; match_i < matches; match_i++) {
+      console.log("match", match_i, "of", matches)
+
+      // set up the board
+      _init();
+
+      // play until the game is over
+      while(!_is_game_over(grid)) {
+        
+        // should we play for the current player?
+        var current_player_controller = controllers[_current_player];
+        if(!current_player_controller.is_ai) {
+          // check again in 1 second
+          yield * babysitter.waitForSeconds(1);                 
+        }
+        else {
+          // prevent all interference while the AI is thinking
+          yield * mutex.claim();
+
+          // evaluate each option
+          var best_utility = -Infinity;
+          var options = _get_options(grid, _current_player);
+          useful.assert(options.length > 0, "there should always be an option");      
+          var best_options = [];
+          for(var i = 0; i < options.length; i++) {
+            var option = options[i];
+            var option_utility = current_player_controller.evaluate_option(option, _current_player);
+            if(option_utility >= best_utility) {
+              if(option_utility > best_utility) {
+                // there's a new kind on the block: clear out the original set of best options
+                best_utility = option_utility;
+                best_options.length = 0;
+              }
+              
+              // add this option to the set of best options
+              best_options.push(option);
+            }
+          }
+    
+          // choose on of the best options at random
+          useful.assert(best_options.length > 0, "there should always be a best option");
+          var chosen_option = useful.rand_in(best_options)
+        
+          // apply the options
+          if(args.verbose) {
+            console.log(current_player_controller.name, "taking turn for player", _current_player);
+          }
+          useful.assert(_try_apply_option(chosen_option, _current_player));
+          _current_player = _other_player[_current_player];
+
+          // the AI has finished thinking so can release the mutex
+          yield * mutex.release(); 
+
+          // pause for a moment
+          if(args.verbose) {
+            yield * babysitter.waitForSeconds(0.1);                         
+          }
+        }  
+      }
+
+      // figure out who won and who lost
+      var winner, loser, winner_score, loser_score;
+      var blue_score = _get_score(grid, "blue_player");
+      var red_score = _get_score(grid, "red_player");
+      if(blue_score > red_score) {
+        winner = "blue_player";
+        loser = "red_player";
+        winner_score = blue_score;
+        loser_score = red_score;
+      }
+      else if(red_score > blue_score) {
+        winner = "red_player";
+        loser = "blue_player";
+        winner_score = red_score;
+        loser_score = blue_score;
+      }
+
+      // report the winner, even if not in verbose mode
+      if(winner) {
+        console.log(controllers[winner].name, "beat", controllers[loser].name, winner_score, "to", loser_score);
+        victories[winner]++;
       }
       else {
-        // prevent all interference while the AI is thinking
-        yield * mutex.claim();
-
-        // evaluate each option
-        var best_utility = -Infinity;
-        var options = _get_options(grid, _current_player);
-        useful.assert(options.length > 0, "there should always be an option");      
-        var best_options = [];
-        for(var i = 0; i < options.length; i++) {
-          var option = options[i];
-          var option_utility = current_player_controller.evaluate_option(option, _current_player);
-          if(option_utility >= best_utility) {
-            if(option_utility > best_utility) {
-              // there's a new kind on the block: clear out the original set of best options
-              best_utility = option_utility;
-              best_options.length = 0;
-            }
-            
-            // add this option to the set of best options
-            best_options.push(option);
-          }
-        }
-  
-        // choose on of the best options at random
-        useful.assert(best_options.length > 0, "there should always be a best option");
-        var chosen_option = useful.rand_in(best_options)
-      
-        // apply the options
-        if(args.verbose) {
-          console.log(current_player_controller.name, "taking turn for player", _current_player);
-        }
-        useful.assert(_try_apply_option(chosen_option, _current_player));
-        _current_player = _other_player[_current_player];
-
-        // the AI has finished thinking so can release the mutex
-        yield * mutex.release(); 
-
-        // pause for a moment
-        if(args.verbose) {
-          yield * babysitter.waitForSeconds(0.1);                         
-        }
-      }  
+        console.log("draw", red_score, "to", blue_score)
+      }
+      yield * babysitter.waitForNextFrame();                         
     }
 
-    // figure out who won and who lost
-    var winner, loser, winner_score, loser_score;
-    var blue_score = _get_score(grid, "blue_player");
-    var red_score = _get_score(grid, "red_player");
-    if(blue_score > red_score) {
-      winner = "blue_player";
-      loser = "red_player";
-      winner_score = blue_score;
-      loser_score = red_score;
-    }
-    else if(red_score > blue_score) {
-      winner = "red_player";
-      loser = "blue_player";
-      winner_score = red_score;
-      loser_score = blue_score;
-    }
-
-    if(winner) {
-      console.log(controllers[winner].name, "beat", controllers[loser].name, winner_score, "to", loser_score);
-    }
-    else {
-      console.log("draw", red_score, "to", blue_score)
-    }
-
+    // results
+    console.log(controllers.red_player.name, "won", Math.floor(victories.red_player/matches*100) + "%", "of the time");
+    console.log(controllers.blue_player.name, "won", Math.floor(victories.blue_player/matches*100) + "%", "of the time");
   }
   
   // ------------------------------------------------------------------------------------------
