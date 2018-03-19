@@ -152,42 +152,24 @@ var minimax = function() {
 
     // recalculate open tiles
     var local_grid = tile.grid;
-    var open_tile_count = 0;
     var next_player = _other_player[player];    
     local_grid.map(function(t) {
       if(_is_valid_option(t, next_player)) {
         t.set_type("open");
-        open_tile_count++;
       }
       else if(t.is_type("open")) {
         t.set_type("free");
       }
     });
 
-    // check for game over
-    if(open_tile_count <= 0) {
-      var blue_score = _get_score(local_grid, "blue_player");
-      var red_score = _get_score(local_grid, "red_player");
-      if(blue_score > red_score) {
-        console.log("blue player wins", blue_score, "to", red_score);  
-      }
-      else if(red_score > blue_score) {
-        console.log("red player wins", red_score, "to", blue_score);  
-      }
-      else {
-        console.log("draw", red_score, "to", blue_score);
-      }
-    }
-
-    // place a piece successfully
+    // we have placed the piece successfully
     return true;
   }
 
   minimax.place_piece = function*(tile) {
     yield * mutex.claim();
-
     if(_try_apply_option(tile, _current_player)) {
-      _current_player = _other_player[_current_player];
+      _current_player = _other_player[_current_player];    
     }
     else {
       console.warn("invalid option", tile.col, tile.row, "for player", _current_player);
@@ -198,25 +180,23 @@ var minimax = function() {
   }
 
   // ------------------------------------------------------------------------------------------
-  // MINIMAX ALGORITHM
+  // RANDOM EVALUATION
   // ------------------------------------------------------------------------------------------
-  
-  var _evaluate_grid_random = function(local_grid, player) {
-    useful.assert(local_grid, "a grid must be specified");
-    useful.assert(player, "a player must be specified");
-    return Math.random();    
+
+  var _evaluate_option_random = function(tile, player) {
+    useful.assert(tile, "a tile must be specified");
+    useful.assert(player, "a player must be specified");   
+    return Math.random();
   }
+
+  // ------------------------------------------------------------------------------------------
+  // HEURISTIC EVALUATION
+  // ------------------------------------------------------------------------------------------
 
   var _evaluate_grid_heuristic = function(local_grid, player) {
     useful.assert(local_grid, "a grid must be specified");
     useful.assert(player, "a player must be specified");
     return _get_score(local_grid, player);
-  }
-
-  var _evaluate_option_random = function(tile, player) {
-    useful.assert(tile, "a tile must be specified");
-    useful.assert(player, "a player must be specified");    
-    return Math.random();
   }
 
   var _evaluate_option_heuristic = function(tile, player) {
@@ -229,10 +209,47 @@ var minimax = function() {
     return _evaluate_grid_heuristic(local_grid, player);
   }
 
+  // ------------------------------------------------------------------------------------------
+  // MINIMAX ALGORITHM
+  // ------------------------------------------------------------------------------------------
+
+  var _evaluate_grid_minimax = function(local_grid, player) {
+    useful.assert(local_grid, "a grid must be specified");
+    useful.assert(player, "a player must be specified");
+    return 0; // TODO
+  }
+
   var _evaluate_option_minimax = function(tile, player) {
     useful.assert(tile, "a tile must be specified");    
     useful.assert(player, "a player must be specified");
-    return 0;
+    return 0; // TODO
+  }
+
+  // ------------------------------------------------------------------------------------------
+  // PARAMETER MANAGEMENT
+  // ------------------------------------------------------------------------------------------
+
+  var _controllers = {
+    // we could have called this one 'human' but that would be no fun, would it?
+    mechanical_turk : {
+      name : "mechanical_turk",
+      is_ai : false
+    },
+    random : {
+      name : "random",
+      is_ai : true,
+      evaluate_option : _evaluate_option_random
+    },
+    heuristic : {
+      name : "heuristic",
+      is_ai : true,
+      evaluate_option : _evaluate_option_heuristic
+    },
+    minimax : {
+      name : "minimax",
+      is_ai : true,
+      evaluate_option : _evaluate_option_minimax
+    }
   }
 
   // ------------------------------------------------------------------------------------------
@@ -264,52 +281,92 @@ var minimax = function() {
     yield * mutex.release(); 
   }
 
-  minimax.play = function*() {
-
-    yield * mutex.claim();
-
-    yield * babysitter.waitForSeconds(1);                     
+  minimax.play = function*(args) {
+    // check parameters for blue player
+    var controllers = {}
+    controllers.blue_player = _controllers[args.blue_player];
+    useful.assert(controllers.blue_player, "there must be valid parameters for the blue player");
+    controllers.red_player = _controllers[args.red_player];
+    useful.assert(controllers.red_player, "there must be valid parameters for the red player");
 
     // play until the game is over
     while(!_is_game_over(grid)) {
-      // evaluate each option
-      var best_utility = -Infinity;
-      var options = _get_options(grid, _current_player);
-      useful.assert(options.length > 0, "there should always be an option");      
-      var best_options = [];
-      for(var i = 0; i < options.length; i++) {
-        var option = options[i];
-        var option_utility = _evaluate_option_heuristic(option, _current_player);
-        if(option_utility >= best_utility) {
-          if(option_utility > best_utility) {
-            // there's a new kind on the block: clear out the original set of best options
-            best_utility = option_utility;
-            best_options.length = 0;
-          }
-          
-          // add this option to the set of best options
-          best_options.push(option);
-        }
+      
+      // should we play for the current player?
+      var current_player_controller = controllers[_current_player];
+      if(!current_player_controller.is_ai) {
+        // check again in 1 second
+        yield * babysitter.waitForSeconds(1);                 
       }
+      else {
+        // prevent all interference while the AI is thinking
+        yield * mutex.claim();
 
-      // choose on of the best options at random
-      useful.assert(best_options.length > 0, "there should always be a best option");
-      var chosen_option = useful.rand_in(best_options)
-    
-      // apply the options
-      console.log("Taking turn for player", _current_player);
-      useful.assert(_try_apply_option(chosen_option, _current_player));
-      _current_player = _other_player[_current_player];      
+        // evaluate each option
+        var best_utility = -Infinity;
+        var options = _get_options(grid, _current_player);
+        useful.assert(options.length > 0, "there should always be an option");      
+        var best_options = [];
+        for(var i = 0; i < options.length; i++) {
+          var option = options[i];
+          var option_utility = current_player_controller.evaluate_option(option, _current_player);
+          if(option_utility >= best_utility) {
+            if(option_utility > best_utility) {
+              // there's a new kind on the block: clear out the original set of best options
+              best_utility = option_utility;
+              best_options.length = 0;
+            }
+            
+            // add this option to the set of best options
+            best_options.push(option);
+          }
+        }
+  
+        // choose on of the best options at random
+        useful.assert(best_options.length > 0, "there should always be a best option");
+        var chosen_option = useful.rand_in(best_options)
+      
+        // apply the options
+        if(args.verbose) {
+          console.log(current_player_controller.name, "taking turn for player", _current_player);
+        }
+        useful.assert(_try_apply_option(chosen_option, _current_player));
+        _current_player = _other_player[_current_player];
 
-      // wait for a moment before taking the next turn
-      yield * babysitter.waitForSeconds(0.1);                 
+        // the AI has finished thinking so can release the mutex
+        yield * mutex.release(); 
+
+        // pause for a moment
+        if(args.verbose) {
+          yield * babysitter.waitForSeconds(0.1);                         
+        }
+      }  
     }
 
-    // finished
-    console.log("game over")
-  
-    // clean up
-    yield * mutex.release(); 
+    // figure out who won and who lost
+    var winner, loser, winner_score, loser_score;
+    var blue_score = _get_score(grid, "blue_player");
+    var red_score = _get_score(grid, "red_player");
+    if(blue_score > red_score) {
+      winner = "blue_player";
+      loser = "red_player";
+      winner_score = blue_score;
+      loser_score = red_score;
+    }
+    else if(red_score > blue_score) {
+      winner = "red_player";
+      loser = "blue_player";
+      winner_score = red_score;
+      loser_score = blue_score;
+    }
+
+    if(winner) {
+      console.log(controllers[winner].name, "beat", controllers[loser].name, winner_score, "to", loser_score);
+    }
+    else {
+      console.log("draw", red_score, "to", blue_score)
+    }
+
   }
   
   // ------------------------------------------------------------------------------------------

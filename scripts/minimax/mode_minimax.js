@@ -38,7 +38,13 @@ var mode_minimax = function() {
 
     // place the initial pieces
     babysitter.add(minimax.init);
-    babysitter.add(minimax.play);
+
+    // let the AI play the game
+    babysitter.add(minimax.play, {
+      verbose : false,
+      red_player : "random",
+      blue_player : "heuristic"
+    });
   }
 
   mode_minimax.left_click = function(tile) {
