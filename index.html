@@ -28,6 +28,11 @@
         </canvas>  
     </div>
 
+    <div style="position: absolute; top: 8px; left: 8px; user-select: none;">
+      <button onclick="babysitter.clear(); mode = mode_astar; mode.init();">A* demo</button>
+      <button onclick="babysitter.clear(); mode = mode_minimax; mode.init();">Minimax demo</button>
+    </div>
+
     <div style="display:none">
         <canvas id="source_canvas" width="1280" height="720">    
         </canvas>

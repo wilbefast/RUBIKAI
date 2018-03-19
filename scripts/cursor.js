@@ -49,7 +49,7 @@ var cursor = function() {
       return;
     }
 
-    if(cursor.tile) {
+    if(cursor.tile && mode) {
       mode.left_click(cursor.tile)
     }
   }
@@ -59,7 +59,7 @@ var cursor = function() {
       return;
     }
 
-    if(cursor.tile) {
+    if(cursor.tile && mode) {
       mode.right_click(cursor.tile)
     }
   }
