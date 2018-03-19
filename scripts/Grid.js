@@ -18,6 +18,8 @@ Lesser General Public License for more details.
 // GRID CLASS
 // ----------------------------------------------------------------------------
 
+var _next_guid = 1;
+
 var Grid = function() {
 
     // ------------------------------------------------------------------------------------------
@@ -28,6 +30,10 @@ var Grid = function() {
 
       // check parameters
       useful.copy_entries(args, this, [ "n_cols", "n_rows", "tile_class", "tile_draw_w", "tile_draw_h" ]);
+
+      // globally unique identifier
+      this.hash = _next_guid;
+      _next_guid++;
       
       // rendering
       this.draw_w = this.n_cols*this.tile_draw_w;
@@ -95,6 +101,22 @@ var Grid = function() {
       return this;
     }
     
+    Grid.prototype.clone = function() {
+      var clone = new Grid({
+        n_cols : this.n_cols,
+        n_rows : this.n_rows,
+        tile_class : this.tile_class,
+        tile_draw_w : this.tile_draw_w,
+        tile_draw_h : this.tile_draw_h
+      });
+      
+      for(var i = 0; i < clone.tiles.length; i++) {
+        clone.tiles[i].mimic_type_from(this.tiles[i]);
+      }
+
+      return clone;
+    }
+
     // ------------------------------------------------------------------------------------------
     // ACCESS
     // ------------------------------------------------------------------------------------------

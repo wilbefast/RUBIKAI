@@ -40,8 +40,6 @@ var Tile = function() {
     return this;
   }
 
-  //Tile.prototype.DEBUG = true;
-
   // ------------------------------------------------------------------------------------------
   // TYPES
   // ------------------------------------------------------------------------------------------
@@ -87,6 +85,10 @@ var Tile = function() {
 
   Tile.prototype.is_type = function(type_name) {
     return this.tile_type.name === type_name
+  }
+
+  Tile.prototype.mimic_type_from = function(other_tile) {
+    return this.tile_type = other_tile.tile_type;
   }
 
   // ------------------------------------------------------------------------------------------

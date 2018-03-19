@@ -201,15 +201,45 @@ var minimax = function() {
   // MINIMAX ALGORITHM
   // ------------------------------------------------------------------------------------------
   
-  var _evaluate = function(tile) {
+  var _evaluate_grid_random = function(local_grid, player) {
+    useful.assert(local_grid, "a grid must be specified");
+    useful.assert(player, "a player must be specified");
+    return Math.random();    
+  }
+
+  var _evaluate_grid_heuristic = function(local_grid, player) {
+    useful.assert(local_grid, "a grid must be specified");
+    useful.assert(player, "a player must be specified");
+    return _get_score(local_grid, player);
+  }
+
+  var _evaluate_option_random = function(tile, player) {
+    useful.assert(tile, "a tile must be specified");
+    useful.assert(player, "a player must be specified");    
     return Math.random();
+  }
+
+  var _evaluate_option_heuristic = function(tile, player) {
+    useful.assert(tile, "a tile must be specified"); 
+    useful.assert(player, "a player must be specified");    
+    var local_grid = tile.grid.clone();
+    var local_tile = local_grid.grid_to_tile(tile.col, tile.row);
+    
+    useful.assert(_try_apply_option(local_tile, player), "option must be valid");
+    return _evaluate_grid_heuristic(local_grid, player);
+  }
+
+  var _evaluate_option_minimax = function(tile, player) {
+    useful.assert(tile, "a tile must be specified");    
+    useful.assert(player, "a player must be specified");
+    return 0;
   }
 
   // ------------------------------------------------------------------------------------------
   // PUBLIC FUNCTIONS
   // ------------------------------------------------------------------------------------------
   
-  minimax.init = function*() {
+  minimax.init = function*(player) {
     yield * mutex.claim();
 
     // clean up
@@ -249,7 +279,7 @@ var minimax = function() {
       var best_options = [];
       for(var i = 0; i < options.length; i++) {
         var option = options[i];
-        var option_utility = _evaluate(option, _current_player);
+        var option_utility = _evaluate_option_heuristic(option, _current_player);
         if(option_utility >= best_utility) {
           if(option_utility > best_utility) {
             // there's a new kind on the block: clear out the original set of best options

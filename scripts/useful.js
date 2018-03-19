@@ -56,6 +56,7 @@ var useful = function() {
   }
 
   useful.assert = function(predicate, message) {
+    // there's a console.assert you can use too, but this one can receive a break point more easily
     if(!predicate) {
       console.error(message);
       console.trace();
