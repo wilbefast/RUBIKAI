@@ -40,8 +40,8 @@ var mode_minimax = function() {
     babysitter.add(minimax.play, {
       verbose : true,
       matches : 10,
-      red_player : "heuristic",
-      blue_player : "minimax"
+      red_player : "minimax",
+      blue_player : "minimax_ab"
     });
   }
 

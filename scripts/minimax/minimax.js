@@ -247,10 +247,10 @@ var minimax = function() {
     useful.assert(player, "a player must be specified");
     useful.assert(depth !== undefined, "a depth must be specified");
 
-    //  here we're asking the question: "what's the worst that could happen?"
+    // Here we're asking the question: "what's the worst that could happen?"
     var worst_value = Infinity;
     for(var i = 0; i < options.length; i++) {
-      var value = _evaluate_option_minimax(options[i], player, depth);
+      var value = _evaluate_option_minimax(options[i], player, depth + 1);
       if(value < worst_value) {
         worst_value = value;
       }
@@ -265,10 +265,10 @@ var minimax = function() {
     useful.assert(player, "a player must be specified");
     useful.assert(depth !== undefined, "a depth must be specified");
 
-    //  here we're asking the question: "what's the best that could happen?"
+    // Here we're asking the question: "what's the best that could happen?"
     var best_value = -Infinity;
     for(var i = 0; i < options.length; i++) {
-      var value = _evaluate_option_minimax(options[i], player, depth);
+      var value = _evaluate_option_minimax(options[i], player, depth + 1);
       if(value > best_value) {
         best_value = value;
       }
@@ -308,10 +308,10 @@ var minimax = function() {
       var options = _get_options(local_grid, next_player);
       useful.assert(options.length > 0, "game is not over so there should be at least 1 option");
       if(next_player === _current_player) {
-        return _evaluate_options_minimax_max(options, next_player, depth + 1);
+        return _evaluate_options_minimax_max(options, next_player, depth);
       }
       else {
-        return _evaluate_options_minimax_min(options, next_player, depth + 1);
+        return _evaluate_options_minimax_min(options, next_player, depth);
       }
     }
   }
@@ -319,13 +319,120 @@ var minimax = function() {
   _evaluate_option_minimax = function(tile, player, depth) {
     useful.assert(tile, "a tile must be specified");    
     useful.assert(player, "a player must be specified");
-    depth = depth || 0;
+    if(depth === undefined) {
+      depth = 0;
+    }
 
     var local_grid = tile.grid.clone();
     var local_tile = local_grid.grid_to_tile(tile.col, tile.row);
     useful.assert(_try_apply_option(local_tile, player), "option must be valid");
 
     return _evaluate_grid_minimax(local_grid, player, depth);
+  }
+
+  // ------------------------------------------------------------------------------------------
+  // MINIMAX ALGORITHM WITH ALPHA-BETA PRUNING
+  // ------------------------------------------------------------------------------------------
+
+  // The complexity here is only O(b^(d/2)) where d is the depth and b is branching factor
+  // so we can double the search depth with regard to minimax
+  var _max_depth_ab = 4;
+
+  var _evaluate_option_minimax_ab; // forward declaration, just like old times ;)
+
+  var _evaluate_options_minimax_min_ab = function(options, player, depth, alpha, beta) {
+    useful.assert(options, "a set of options must be specified");    
+    useful.assert(player, "a player must be specified");
+    useful.assert(depth !== undefined, "a depth must be specified");
+
+    // Here we're asking the question: "what's the worst that could happen?"
+    for(var i = 0; i < options.length; i++) {
+      var beta_prime = _evaluate_option_minimax_ab(options[i], player, depth + 1, alpha, beta);
+      beta = Math.min(beta, beta_prime)
+      if(beta < alpha) {
+        break;
+      }
+    }
+
+    useful.assert(beta >= 0 && beta <= 1, "utility values should be between 0 and 1");
+    return beta;
+  }
+
+  var _evaluate_options_minimax_max_ab = function(options, player, depth, alpha, beta) {
+    useful.assert(options, "a set of options must be specified");    
+    useful.assert(player, "a player must be specified");
+    useful.assert(depth !== undefined, "a depth must be specified");
+
+    // Here we're asking the question: "what's the best that could happen?"
+    var best_value = -Infinity;
+    for(var i = 0; i < options.length; i++) {
+      var alpha_prime = _evaluate_option_minimax_ab(options[i], player, depth + 1);
+      alpha = Math.max(alpha, alpha_prime);
+      if(alpha >= beta) {
+        break;
+      }
+    }
+
+    useful.assert(alpha >= 0 && alpha <= 1, "utility values should be between 0 and 1");    
+    return alpha;
+  }
+
+  var _evaluate_grid_minimax_ab = function(local_grid, player, depth, alpha, beta) {
+    useful.assert(local_grid, "a grid must be specified");
+    useful.assert(player, "a player must be specified");
+    useful.assert(depth !== undefined, "a depth must be specified");
+
+    if(depth >= _max_depth_ab) {
+      // for performance reasons we need to default to a heuristic evaluation when we go too deep
+      // this is why it took us so long to make machines that could win at Go
+      return _evaluate_grid_heuristic(local_grid, _current_player);
+    }
+    else if(_is_game_over(local_grid)) {
+      // true leaf nodes are the only nodes we can evaluate truthfully,
+      // meaning that we could "solve" the game if our max depth was infinite
+      if(_is_winner(local_grid, _current_player)) {
+        return 1;
+      }
+      else if (_is_winner(local_grid, _other_player[_current_player])) {
+        return 0;
+      }
+      else {
+        return 0.5;
+      }
+    }
+    else {
+      // otherwise the value of the board is either the value of the best option for us, 
+      // if it's our turn, or the worst option for us, if it's our adversary's turn
+      var next_player = _other_player[player];
+      var options = _get_options(local_grid, next_player);
+      useful.assert(options.length > 0, "game is not over so there should be at least 1 option");
+      if(next_player === _current_player) {
+        return _evaluate_options_minimax_max_ab(options, next_player, depth, alpha, beta);
+      }
+      else {
+        return _evaluate_options_minimax_min_ab(options, next_player, depth, alpha, beta);
+      }
+    }
+  }
+
+  _evaluate_option_minimax_ab = function(tile, player, depth, alpha, beta) {
+    useful.assert(tile, "a tile must be specified");    
+    useful.assert(player, "a player must be specified");
+    if(depth === undefined) {
+      depth = 0;
+    }
+    if(alpha === undefined) {
+      alpha = 0;
+    }
+    if(beta === undefined) {
+      beta = 1;
+    }
+
+    var local_grid = tile.grid.clone();
+    var local_tile = local_grid.grid_to_tile(tile.col, tile.row);
+    useful.assert(_try_apply_option(local_tile, player), "option must be valid");
+
+    return _evaluate_grid_minimax_ab(local_grid, player, depth, alpha, beta);
   }
 
   // ------------------------------------------------------------------------------------------
@@ -352,6 +459,11 @@ var minimax = function() {
       name : "minimax",
       is_ai : true,
       evaluate_option : _evaluate_option_minimax
+    },
+    minimax_ab : {
+      name : "minimax_ab",
+      is_ai : true,
+      evaluate_option : _evaluate_option_minimax_ab
     }
   }
 
@@ -395,7 +507,7 @@ var minimax = function() {
 
 
           // evaluate each option
-          if(args.verbose) {
+          if(args.DEBUG) {
             console.log(current_player_controller.name, "thinking for player", _current_player);
           }
           var best_utility = -Infinity;
@@ -422,7 +534,7 @@ var minimax = function() {
           var chosen_option = useful.rand_in(best_options)
         
           // apply the option
-          if(args.verbose) {
+          if(args.DEBUG) {
             console.log(current_player_controller.name, "taking turn for player", _current_player);
           }
           useful.assert(_try_apply_option(chosen_option, _current_player));
