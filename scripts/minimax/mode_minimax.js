@@ -37,10 +37,8 @@ var mode_minimax = function() {
     });
 
     // place the initial pieces
-    grid.grid_to_tile(3, 3).set_type("red_player");
-    grid.grid_to_tile(4, 3).set_type("blue_player");
-    grid.grid_to_tile(4, 4).set_type("red_player");
-    grid.grid_to_tile(3, 4).set_type("blue_player");
+    babysitter.add(minimax.init);
+    babysitter.add(minimax.play);
   }
 
   mode_minimax.left_click = function(tile) {

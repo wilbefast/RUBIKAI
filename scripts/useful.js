@@ -58,6 +58,7 @@ var useful = function() {
   useful.assert = function(predicate, message) {
     if(!predicate) {
       console.error(message);
+      console.trace();
     }
 
     return predicate;

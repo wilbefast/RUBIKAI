@@ -38,6 +38,9 @@ var cursor = function() {
   
     if(new_tile != cursor.tile) {
       cursor.tile = new_tile;
+      if(cursor.DEBUG) {
+        console.log("hovering", new_tile.col, new_tile.row);
+      }
     }
   }
   
