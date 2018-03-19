@@ -53,14 +53,16 @@ var astar = function() {
   // MAZE
   // ------------------------------------------------------------------------------------------
   
-  astar.generate_maze = function*() {
+  astar.generate_maze = function*(args) {
     // lock mutex
     yield * mutex.claim();
 
+    // count frames
+    var frame_count = 0;
+
     // set all tiles to "wall"
     yield * grid.map_coroutine(function*(tile) {
-      tile.set_type("wall");
-      //yield * babysitter.waitForNextFrame();         
+      tile.set_type("wall");      
     });
 
     // pick random starting tile
@@ -95,8 +97,9 @@ var astar = function() {
           }
         });
   
-        // skip a frame every once and a while so we have time to see the maze creation progress
-        if(Math.random() > 0.99) {
+        // skip show maze creation progress every 50 frames if in verbose mode 
+        frame_count++;
+        if(args.verbose && !(frame_count%50)) {
           yield * babysitter.waitForNextFrame();     
         }
       };
@@ -113,7 +116,9 @@ var astar = function() {
         }
       });
 
-      yield * babysitter.waitForSeconds(0.1);           
+      if(args.verbose) {
+        yield * babysitter.waitForSeconds(0.1);           
+      }
     }
 
     // all done
@@ -124,7 +129,10 @@ var astar = function() {
   // A STAR
   // ------------------------------------------------------------------------------------------
   
-  astar.move_to = function*(destination_tile) {
+  astar.move_to = function*(args) {
+    var destination_tile = args.destination;
+    useful.assert(destination_tile, "a destination must be specified");
+
     yield * mutex.claim();
 
     if(!destination_tile.is_type("free")) {
@@ -154,7 +162,9 @@ var astar = function() {
           tile.set_type("path");
           path.unshift(tile);
           tile = tile.previous;
-          yield * babysitter.waitForNextFrame();           
+          if(args.verbose) {
+            yield * babysitter.waitForNextFrame();           
+          }
         }
 
         // time to stop
@@ -202,7 +212,9 @@ var astar = function() {
       });
 
       // skip a frame so the we can see the path being calculated in real time
-      yield * babysitter.waitForNextFrame();           
+      if(args.verbose) {   
+        yield * babysitter.waitForNextFrame();           
+      }
     }
 
     // clean up

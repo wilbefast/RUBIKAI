@@ -37,7 +37,9 @@ var mode_astar = function() {
     });
 
     // create a maze
-    babysitter.add(astar.generate_maze);
+    babysitter.add(astar.generate_maze, {
+      verbose : true
+    });
 
     // spawn the player
     babysitter.add(astar.spawn_player);
@@ -45,7 +47,10 @@ var mode_astar = function() {
 
   mode_astar.left_click = function(tile) {
     // move the player
-    babysitter.add(astar.move_to, tile);
+    babysitter.add(astar.move_to, {
+      destination : tile,
+      verbose : false
+    });
   }
 
   mode_astar.right_click = function(tile) {
