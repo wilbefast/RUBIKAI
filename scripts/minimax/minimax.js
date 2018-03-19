@@ -238,14 +238,14 @@ var minimax = function() {
   // ------------------------------------------------------------------------------------------
 
   // Note the complexity is O(b^d) where d is the depth and b is branching factor!  
-  var _max_depth = 10;
+  var _max_depth = 3;
 
   var _evaluate_option_minimax; // forward declaration, just like old times ;)
 
   var _evaluate_options_minimax_min = function(options, player, depth) {
     useful.assert(options, "a set of options must be specified");    
     useful.assert(player, "a player must be specified");
-    useful.assert(depth, "a depth must be specified");
+    useful.assert(depth !== undefined, "a depth must be specified");
 
     //  here we're asking the question: "what's the worst that could happen?"
     var worst_value = Infinity;
@@ -263,7 +263,7 @@ var minimax = function() {
   var _evaluate_options_minimax_max = function(options, player, depth) {
     useful.assert(options, "a set of options must be specified");    
     useful.assert(player, "a player must be specified");
-    useful.assert(depth, "a depth must be specified");
+    useful.assert(depth !== undefined, "a depth must be specified");
 
     //  here we're asking the question: "what's the best that could happen?"
     var best_value = -Infinity;
@@ -281,20 +281,20 @@ var minimax = function() {
   var _evaluate_grid_minimax = function(local_grid, player, depth) {
     useful.assert(local_grid, "a grid must be specified");
     useful.assert(player, "a player must be specified");
-    useful.assert(depth, "a depth must be specified");
+    useful.assert(depth !== undefined, "a depth must be specified");
 
-    if(depth > _max_depth) {
+    if(depth >= _max_depth) {
       // for performance reasons we need to default to a heuristic evaluation when we go too deep
       // this is why it took us so long to make machines that could win at Go
-      return _evaluate_option_heuristic(tile, player);
+      return _evaluate_grid_heuristic(local_grid, _current_player);
     }
     else if(_is_game_over(local_grid)) {
       // true leaf nodes are the only nodes we can evaluate truthfully,
       // meaning that we could "solve" the game if our max depth was infinite
-      if(_is_winner(local_grid, player)) {
+      if(_is_winner(local_grid, _current_player)) {
         return 1;
       }
-      else if (_is_winner(local_grid, _other_player[player])) {
+      else if (_is_winner(local_grid, _other_player[_current_player])) {
         return 0;
       }
       else {
@@ -319,13 +319,13 @@ var minimax = function() {
   _evaluate_option_minimax = function(tile, player, depth) {
     useful.assert(tile, "a tile must be specified");    
     useful.assert(player, "a player must be specified");
-    useful.assert(depth, "a depth must be specified");
+    depth = depth || 0;
 
     var local_grid = tile.grid.clone();
     var local_tile = local_grid.grid_to_tile(tile.col, tile.row);
     useful.assert(_try_apply_option(local_tile, player), "option must be valid");
 
-    return _evaluate_grid_minimax(local_grid, player);
+    return _evaluate_grid_minimax(local_grid, player, depth);
   }
 
   // ------------------------------------------------------------------------------------------
@@ -382,8 +382,7 @@ var minimax = function() {
       _init();
 
       // play until the game is over
-      while(!_is_game_over(grid)) {
-        
+      while(!_is_game_over(grid)) {        
         // should we play for the current player?
         var current_player_controller = controllers[_current_player];
         if(!current_player_controller.is_ai) {
@@ -394,7 +393,11 @@ var minimax = function() {
           // prevent all interference while the AI is thinking
           yield * mutex.claim();
 
+
           // evaluate each option
+          if(args.verbose) {
+            console.log(current_player_controller.name, "thinking for player", _current_player);
+          }
           var best_utility = -Infinity;
           var options = _get_options(grid, _current_player);
           useful.assert(options.length > 0, "there should always be an option");      
@@ -418,7 +421,7 @@ var minimax = function() {
           useful.assert(best_options.length > 0, "there should always be a best option");
           var chosen_option = useful.rand_in(best_options)
         
-          // apply the options
+          // apply the option
           if(args.verbose) {
             console.log(current_player_controller.name, "taking turn for player", _current_player);
           }
