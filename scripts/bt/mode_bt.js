@@ -15,17 +15,17 @@ Lesser General Public License for more details.
 "use strict";
 
 // ----------------------------------------------------------------------------
-// MAZE GENERATION AND A* DEMO
+// BEHAVIOUR TREE DEMO
 // ----------------------------------------------------------------------------
 
-var mode_astar = function() {
-  var mode_astar = {
+var mode_bt = function() {
+  var mode_bt = {
   }
 
-  mode_astar.init = function() {
+  mode_bt.init = function() {
 
     // set random seed, for easier debugging
-    Math.seedrandom('To be or not to be, that is the question.');
+    Math.seedrandom('Two household, both alike in dignity.');
 
     // create a nice big grid
     grid = new Grid({
@@ -41,19 +41,21 @@ var mode_astar = function() {
       verbose : true
     });
 
-    // spawn the player
-    babysitter.add(astar.spawn_player);
-  }
-
-  mode_astar.left_click = function(tile) {
-    // move the player
-    babysitter.add(astar.move_to, {
-      destination : tile,
-      verbose : true
+    var bt = new BehaviourTree({
     });
+
+    var bn = new SequenceNode({
+      tree : bt
+    });
+
+    console.log(bn)
   }
 
-  mode_astar.right_click = function(tile) {
+  mode_bt.left_click = function(tile) {
+    // left click is not bound to anything
+  }
+
+  mode_bt.right_click = function(tile) {
     // right click is not bound to anything
   }
 
@@ -61,5 +63,5 @@ var mode_astar = function() {
   // EXPORT
   // ------------------------------------------------------------------------------------------
 
-  return mode_astar;
+  return mode_bt;
 }();
