@@ -15,18 +15,19 @@ Lesser General Public License for more details.
 "use strict";
 
 // ----------------------------------------------------------------------------
-// SEQUENCE BEHAVIOUR NODE CLASS
+// CAVEMAN CLASS
 // ----------------------------------------------------------------------------
 
-var SequenceNode = function() {
+
+var Caveman = function() {
 
   // ------------------------------------------------------------------------------------------
   // CONSTRUCTOR
   // ------------------------------------------------------------------------------------------
 
-  var SequenceNode = function(args) {
-    args.update = SequenceNode.prototype.update;    
-    BehaviourNode.call(this, args);
+  var Caveman = function(args) {
+
+    TileObject.call(this, args);
 
     // done
     return this;
@@ -40,13 +41,19 @@ var SequenceNode = function() {
   // UPDATE
   // ------------------------------------------------------------------------------------------
     
-  SequenceNode.prototype.update = function(dt) {
-    this.current_node.update(dt);      
+  Caveman.prototype.update = function(dt) {
   };
+
+  Caveman.prototype.draw = function() {
+    ctx.fillStyle = "blue";
+    ctx.beginPath();
+    ctx.arc(this.draw_x, this.draw_y, 8, 0, 2*Math.PI);
+    ctx.fill();
+  }
   
   // ------------------------------------------------------------------------------------------
   // EXPORT
   // ------------------------------------------------------------------------------------------
 
-  return SequenceNode;
+  return Caveman;
 }();

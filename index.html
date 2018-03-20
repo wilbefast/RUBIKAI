@@ -8,12 +8,15 @@
   <script type="text/javascript" src="scripts/objects.js" defer="true"></script>
   <script type="text/javascript" src="scripts/cursor.js" defer="true"></script>
   <script type="text/javascript" src="scripts/Tile.js" defer="true"></script>
+  <script type="text/javascript" src="scripts/TileObject.js" defer="true"></script>
   <script type="text/javascript" src="scripts/Grid.js" defer="true"></script>
   <script type="text/javascript" src="scripts/mutex.js" defer="true"></script>
   <script type="text/javascript" src="scripts/astar/astar.js" defer="true"></script>
   <script type="text/javascript" src="scripts/astar/mode_astar.js" defer="true"></script>
   <script type="text/javascript" src="scripts/minimax/minimax.js" defer="true"></script>
   <script type="text/javascript" src="scripts/minimax/mode_minimax.js" defer="true"></script>
+  <script type="text/javascript" src="scripts/bt/Caveman.js" defer="true"></script>
+  <script type="text/javascript" src="scripts/bt/Berry.js" defer="true"></script>
   <script type="text/javascript" src="scripts/bt/BehaviourNode.js" defer="true"></script>
   <script type="text/javascript" src="scripts/bt/SequenceNode.js" defer="true"></script>
   <script type="text/javascript" src="scripts/bt/SelectorNode.js" defer="true"></script>
@@ -36,6 +39,7 @@
     <div style="position: absolute; top: 8px; left: 8px; user-select: none;">
       <button onclick="babysitter.clear(); mode = mode_astar; mode.init();">A* demo</button>
       <button onclick="babysitter.clear(); mode = mode_minimax; mode.init();">Minimax demo</button>
+      <button onclick="babysitter.clear(); mode = mode_bt; mode.init();">Behaviour Tree demo</button>
     </div>
 
     <div style="display:none">

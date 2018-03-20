@@ -23,6 +23,9 @@ var mode_bt = function() {
   }
 
   mode_bt.init = function() {
+    
+    // clean up
+    objects.clear();
 
     // set random seed, for easier debugging
     Math.seedrandom('Two household, both alike in dignity.');
@@ -41,14 +44,94 @@ var mode_bt = function() {
       verbose : true
     });
 
-    var bt = new BehaviourTree({
-    });
+    // create bot
+    babysitter.add(function*() {
 
-    var bn = new SequenceNode({
-      tree : bt
-    });
+      yield * mutex.claim();
 
-    console.log(bn)
+      // create the caveman's house
+      var caveman_tile = grid.get_random_tile(function(tile) {
+        return tile.is_type("free") && tile.all_neighbours("8", function(n) {
+          return n.is_type("free");
+        });
+      });
+      useful.assert(caveman_tile, "there must be a tile for the player to spawn on");
+      caveman_tile.set_type("caveman_home");
+      yield * babysitter.waitForSeconds(0.5);
+
+      // create the caveman
+      caveman_tile = caveman_tile.map_neighbours("4", function(n) {
+        return n;
+      });
+      var bot = new Caveman({
+        tile : caveman_tile
+      })
+      yield * babysitter.waitForSeconds(0.5);
+      
+      // create berries
+      for(var i = 0; i < 0.1*grid.tiles.length; i++) {
+        var berry_tile = grid.get_random_tile(function(tile) {
+          return !tile.contents && tile.is_type("free");
+        });
+        useful.assert(berry_tile, "it should be possible to find valid tiles to receive berries");
+        new Berry({
+          tile : berry_tile
+        })
+      }
+
+      // create behaviour tree
+      var root = new BehaviourTree({
+      });
+        var main_selector = new SelectorNode({
+          parent : root
+        });
+          var carry_check = new BehaviourNode({
+            parent : main_selector,
+            update : function(dt) {
+
+            }
+          });
+            var eat_sequence = new SequenceNode({
+              parent : carry_check
+            });
+              var go_home = new BehaviourNode({
+                parent : eat_sequence,
+                update : function(dt) {
+
+                }
+              });
+              var eat_food = new BehaviourNode({
+                parent : eat_sequence,
+                update : function(dt) {
+
+                }
+              });
+          var berry_check = new BehaviourNode({
+            parent : main_selector,
+            update : function(dt) {
+
+            }
+          });
+            var get_berries = new BehaviourNode({
+              parent : eat_sequence,
+              update : function(dt) {
+              
+              }
+            });
+          var roam = new BehaviourNode({
+            parent : main_selector,
+            update : function(dt) {
+
+            }
+          });
+
+      // done
+      yield * mutex.release();
+    });
+  }
+
+  mode_bt.update = function(dt) {
+
   }
 
   mode_bt.left_click = function(tile) {
@@ -58,6 +141,7 @@ var mode_bt = function() {
   mode_bt.right_click = function(tile) {
     // right click is not bound to anything
   }
+
 
   // ------------------------------------------------------------------------------------------
   // EXPORT

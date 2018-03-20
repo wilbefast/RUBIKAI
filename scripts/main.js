@@ -80,6 +80,10 @@ var main = function() {
     dest_ctx.off_y = (dest_can.height - can.height*dest_ctx.global_scale)*0.5;
 
     babysitter.update(dt);
+    objects.update(dt);
+    if(mode.update) {
+      mode.update(dt);
+    }
   }
 
   function draw() {

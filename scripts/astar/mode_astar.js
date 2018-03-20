@@ -23,6 +23,9 @@ var mode_astar = function() {
   }
 
   mode_astar.init = function() {
+        
+    // clean up
+    objects.clear();
 
     // set random seed, for easier debugging
     Math.seedrandom('To be or not to be, that is the question.');

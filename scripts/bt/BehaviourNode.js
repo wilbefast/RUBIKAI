@@ -29,7 +29,7 @@ var BehaviourNode = function() {
   var BehaviourNode = function(args) {
 
     // check parameters
-    useful.copy_entries(args, this, [ "tree" ]);
+    useful.copy_entries(args, this, [ "parent" ]);
 
     // globally unique identifier
     this.hash = _next_guid;

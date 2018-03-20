@@ -24,6 +24,9 @@ var mode_minimax = function() {
 
   mode_minimax.init = function() {
 
+    // clean up
+    objects.clear();
+
     // set random seed, for easier debugging
     Math.seedrandom('Once more into the breach dear friends.');
 

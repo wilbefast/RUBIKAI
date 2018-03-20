@@ -15,38 +15,37 @@ Lesser General Public License for more details.
 "use strict";
 
 // ----------------------------------------------------------------------------
-// SEQUENCE BEHAVIOUR NODE CLASS
+// BERRY CLASS
 // ----------------------------------------------------------------------------
 
-var SequenceNode = function() {
+
+var Berry = function() {
 
   // ------------------------------------------------------------------------------------------
   // CONSTRUCTOR
   // ------------------------------------------------------------------------------------------
 
-  var SequenceNode = function(args) {
-    args.update = SequenceNode.prototype.update;    
-    BehaviourNode.call(this, args);
+  var Berry = function(args) {
+    TileObject.call(this, args);
 
     // done
     return this;
   }
 
   // ------------------------------------------------------------------------------------------
-  // ACCESS
-  // ------------------------------------------------------------------------------------------
-  
-  // ------------------------------------------------------------------------------------------
   // UPDATE
   // ------------------------------------------------------------------------------------------
     
-  SequenceNode.prototype.update = function(dt) {
-    this.current_node.update(dt);      
+  Berry.prototype.draw = function(dt) {
+    ctx.fillStyle = "purple";
+    ctx.beginPath();
+    ctx.arc(this.draw_x, this.draw_y, 4, 0, 2*Math.PI);
+    ctx.fill();
   };
   
   // ------------------------------------------------------------------------------------------
   // EXPORT
   // ------------------------------------------------------------------------------------------
 
-  return SequenceNode;
+  return Berry;
 }();

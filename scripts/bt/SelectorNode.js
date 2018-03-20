@@ -25,6 +25,7 @@ var SelectorNode = function() {
   // ------------------------------------------------------------------------------------------
 
   var SelectorNode = function(args) {
+    args.update = SelectorNode.prototype.update;
     BehaviourNode.call(this, args);
 
     // done

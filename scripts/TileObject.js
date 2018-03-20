@@ -15,38 +15,40 @@ Lesser General Public License for more details.
 "use strict";
 
 // ----------------------------------------------------------------------------
-// SEQUENCE BEHAVIOUR NODE CLASS
+// TILE OBJECT CLASS
 // ----------------------------------------------------------------------------
 
-var SequenceNode = function() {
+var TileObject = function() {
 
   // ------------------------------------------------------------------------------------------
   // CONSTRUCTOR
   // ------------------------------------------------------------------------------------------
 
-  var SequenceNode = function(args) {
-    args.update = SequenceNode.prototype.update;    
-    BehaviourNode.call(this, args);
+  var _next_guid = 1;
+  var TileObject = function(args) {
+
+    // check parameters
+    useful.copy_entries(args, this, [ "tile" ]);
+    useful.assert(!this.tile.contents && this.tile.is_type("free"), "tile objects must spawn on free tile");
+    this.tile.contents = this;
+    this.draw_x = this.tile.draw_x + this.tile.draw_w*0.5;
+    this.draw_y = this.tile.draw_y + this.tile.draw_h*0.5;
+ 
+    // globally unique identifier
+    this.hash = _next_guid;
+    _next_guid++;
+
+    // add to update and draw lists 
+    objects.add(this);
 
     // done
     return this;
   }
 
-  // ------------------------------------------------------------------------------------------
-  // ACCESS
-  // ------------------------------------------------------------------------------------------
-  
-  // ------------------------------------------------------------------------------------------
-  // UPDATE
-  // ------------------------------------------------------------------------------------------
-    
-  SequenceNode.prototype.update = function(dt) {
-    this.current_node.update(dt);      
-  };
   
   // ------------------------------------------------------------------------------------------
   // EXPORT
   // ------------------------------------------------------------------------------------------
 
-  return SequenceNode;
+  return TileObject;
 }();

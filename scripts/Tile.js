@@ -73,6 +73,10 @@ var Tile = function() {
     blue_player : {
       name : "blue_player",
       colour : "blue"      
+    },
+    caveman_home : {
+      name : "caveman_home",
+      colour : "brown"
     }
   }
 
