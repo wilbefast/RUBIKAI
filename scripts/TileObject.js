@@ -45,6 +45,10 @@ var TileObject = function() {
     return this;
   }
 
+  TileObject.prototype.on_purge = function() {
+    this.tile.contents = null;
+    this.tile = null;
+  }
   
   // ------------------------------------------------------------------------------------------
   // EXPORT

@@ -63,7 +63,7 @@ var mode_bt = function() {
       caveman_tile = caveman_tile.map_neighbours("4", function(n) {
         return n;
       });
-      var bot = new Caveman({
+      var caveman = new Caveman({
         tile : caveman_tile
       })
       yield * babysitter.waitForSeconds(0.5);
@@ -125,13 +125,29 @@ var mode_bt = function() {
             }
           });
 
+      // keep updating until there are no berries left
+      var lastFrameTime = Date.now();
+      while(!caveman.has_berry || objects.any(function(object) {
+        return object.is_berry;
+      })) {
+        // calculate dt
+        var thisFrameTime = Date.now();
+        var deltaTime = thisFrameTime - lastFrameTime;
+        lastFrameTime = thisFrameTime; 
+        var dt = deltaTime / 1000;
+
+        // tick behaviour tree
+
+        // update objects
+        objects.update(dt);
+
+        // wait for the next frame
+        yield * babysitter.waitForNextFrame();
+      }
+
       // done
       yield * mutex.release();
     });
-  }
-
-  mode_bt.update = function(dt) {
-
   }
 
   mode_bt.left_click = function(tile) {

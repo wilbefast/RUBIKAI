@@ -28,9 +28,13 @@ var Berry = function() {
   var Berry = function(args) {
     TileObject.call(this, args);
 
+    Berry.count++;
+
     // done
     return this;
   }
+
+  Berry.prototype.is_berry = true;
 
   // ------------------------------------------------------------------------------------------
   // UPDATE
