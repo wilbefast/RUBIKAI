@@ -79,10 +79,46 @@ var mode_bt = function() {
           tile : berry_tile
         });
 
-        if(i % 2000) {
-          //yield * babysitter.waitForNextFrame();             
+        if(i % 100 === 0) {
+          yield * babysitter.waitForNextFrame();             
         }
       }
+
+      // create the bear
+      var bear_tile = grid.get_random_tile(function(tile) {
+        return !tile.contents && tile.is_type("free") && tile.all_neighbours("8", function(n) {
+          return (!n.contents || n.contents.is_berry) && n.is_type("free");
+        });
+      });
+      var bear = new Bear({
+        tile : bear_tile
+      })
+      yield * babysitter.waitForSeconds(0.25);      
+      bear_tile.map_neighbours("8", function(t) {
+        // clear berries from around the bear
+        if(t.contents && t.contents.is_berry) {
+          t.contents.purge = true;
+        }
+      });
+      yield * babysitter.waitForSeconds(0.25);      
+      
+      // create the rabbit
+      var rabbit_tile = grid.get_random_tile(function(tile) {
+        return !tile.contents && tile.is_type("free") && tile.all_neighbours("8", function(n) {
+          return (!n.contents || n.contents.is_berry) && n.is_type("free");
+        });
+      });
+      var rabbit = new Rabbit({
+        tile : rabbit_tile
+      })
+      yield * babysitter.waitForSeconds(0.25);  
+      rabbit_tile.map_neighbours("8", function(t) {
+        // clear berries from around the rabbit
+        if(t.contents && t.contents.is_berry) {
+          t.contents.purge = true;
+        }
+      });
+      yield * babysitter.waitForSeconds(0.25);     
 
       // create behaviour tree
       var behaviour_tree = new BehaviourTree({
