@@ -45,10 +45,17 @@ var Caveman = function() {
   };
 
   Caveman.prototype.draw = function() {
-    ctx.fillStyle = "blue";
+    ctx.fillStyle = "orange";
     ctx.beginPath();
     ctx.arc(this.draw_x, this.draw_y, 8, 0, 2*Math.PI);
     ctx.fill();
+
+    if(this.has_berry) {
+      ctx.fillStyle = "purple";
+      ctx.beginPath();
+      ctx.arc(this.draw_x, this.draw_y, 4, 0, 2*Math.PI);
+      ctx.fill();  
+    }
   }
   
   // ------------------------------------------------------------------------------------------

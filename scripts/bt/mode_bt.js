@@ -114,8 +114,18 @@ var mode_bt = function() {
 
                   if(!caveman.path) {
                     console.log("going home berry");
-                    caveman.path = astar.get_path_from_to(caveman.tile, caveman_home_tile);
-                    caveman.timer = 1;
+                    var home_entrance = caveman_home_tile.neighbour_most("4", function(entrance_tile) {
+                      // go back to nearest entrance tile
+                      if(entrance_tile.is_type("free")) {
+                        return -entrance_tile.distance_to(caveman.tile);
+                      }
+                      else {
+                        return -Infinity;
+                      }
+                    });
+
+                    caveman.path = astar.get_path_from_to(caveman.tile, home_entrance);
+                    caveman.timer = 0.4;
                   }
                   else if (caveman.path.length < 1) {
                     console.log("finished going home");
@@ -130,6 +140,7 @@ var mode_bt = function() {
                         console.warn(new_tile.contents);
                       }
                       caveman.set_tile(new_tile);
+                      caveman.timer += 0.3;
                     }
                   }
     
@@ -177,7 +188,8 @@ var mode_bt = function() {
                   }
                 });
                 if(caveman.has_berry) {
-                  console.log("harvested berry")
+                  console.log("harvested berry");
+				          caveman.path = null;
                   return BehaviourTree.SUCCESS;
                 }
                 else {
@@ -192,7 +204,7 @@ var mode_bt = function() {
               if(!caveman.path) {
                 console.log("finding berry");
                 caveman.path = astar.get_path_to_berry(caveman.tile);
-                caveman.timer = 1;
+                caveman.timer = 0.4;
               }
               else if (caveman.path.length < 1) {
                 console.log("finished finding berry");
@@ -207,6 +219,7 @@ var mode_bt = function() {
                     console.warn(new_tile.contents);
                   }
                   caveman.set_tile(new_tile);
+                  caveman.timer += 0.1;                  
                 }
               }
 

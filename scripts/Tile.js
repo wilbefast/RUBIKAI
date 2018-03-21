@@ -177,6 +177,19 @@ var Tile = function() {
     });
   }
 
+  Tile.prototype.neighbour_most = function(type, f) {
+    var best = null;
+    var best_value = -Infinity;
+    this.map_neighbours(type, function(n) {
+      var value = f(n);
+      if(value > best_value) {
+        best_value = value;
+        best = n;
+      }
+    });
+    return best;
+  }
+
   Tile.prototype.distance_to = function(other_tile) {
     return vector.dist(this.col, this.row, other_tile.col, other_tile.row);
   }
