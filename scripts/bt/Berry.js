@@ -35,6 +35,8 @@ var Berry = function() {
   }
 
   Berry.prototype.is_berry = true;
+  Berry.prototype.on_purge = TileObject.prototype.on_purge; 
+  Berry.prototype.set_tile = TileObject.prototype.set_tile; 
 
   // ------------------------------------------------------------------------------------------
   // UPDATE

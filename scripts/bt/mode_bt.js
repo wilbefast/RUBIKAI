@@ -25,6 +25,7 @@ var mode_bt = function() {
   mode_bt.init = function() {
     
     // clean up
+    mutex.force_release();
     objects.clear();
 
     // set random seed, for easier debugging
@@ -78,7 +79,7 @@ var mode_bt = function() {
           tile : berry_tile
         });
 
-        if(i % 100) {
+        if(i % 2000) {
           yield * babysitter.waitForNextFrame();             
         }
       }
@@ -110,7 +111,8 @@ var mode_bt = function() {
                 name : "go_home",
                 parent : eat_sequence,
                 update : function(dt) {
-
+                  console.log("going home");
+                  return BehaviourTree.RUNNING;
                 }
               });
               var eat_food = new BehaviourNode({
@@ -118,6 +120,7 @@ var mode_bt = function() {
                 parent : eat_sequence,
                 update : function(dt) {
                   caveman.has_berry = false;
+                  console.log("ate berry")
                   return BehaviourTree.SUCCESS;
                 }
               });
@@ -140,13 +143,14 @@ var mode_bt = function() {
               name : "harvest_berry",
               parent : berry_check,
               update : function(dt) {
-                caveman.map_neighbours("4", function(n) {
+                caveman.tile.map_neighbours("4", function(n) {
                   if(n.contents && n.contents.is_berry) {
                     n.contents.purge = true;
                     caveman.has_berry = true;
                   }
                 });
                 if(caveman.has_berry) {
+                  console.log("harvested berry")
                   return BehaviourTree.SUCCESS;
                 }
                 else {
@@ -158,7 +162,25 @@ var mode_bt = function() {
             name : "find_berry",
             parent : main_selector,
             update : function(dt) {
+              if(!caveman.path) {
+                console.log("finding berry");
+                caveman.path = astar.get_path_to_berry(caveman.tile);
+                caveman.timer = 1;
+              }
+              else if (caveman.path.length == 0) {
+                console.log("finished finding berry");
+                caveman.path = null;
+                return BehaviourTree.SUCCESS;
+              }
+              else {
+                caveman.timer -= dt;
+                if(caveman.timer < 0) {
+                  var new_tile = caveman.path.shift();
+                  caveman.set_tile(new_tile);
+                }
+              }
 
+              return BehaviourTree.RUNNING;
             }
           });
 

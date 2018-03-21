@@ -39,6 +39,13 @@ var mutex = function() {
   mutex.is_locked = function() {
     return _is_locked;
   }
+
+  mutex.force_release = function() {
+    if(_is_locked) {
+      _is_locked = false;
+      console.warn("force mutex release");
+    }
+  }
   
   // ------------------------------------------------------------------------------------------
   // EXPORT

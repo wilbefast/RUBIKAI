@@ -49,6 +49,13 @@ var TileObject = function() {
     this.tile.contents = null;
     this.tile = null;
   }
+
+  TileObject.prototype.set_tile = function(new_tile) {
+    useful.assert(!new_tile.contents, "new tile should be free");
+    this.tile.contents = null;
+    new_tile.contents = this;
+    this.tile = new_tile;
+  }
   
   // ------------------------------------------------------------------------------------------
   // EXPORT

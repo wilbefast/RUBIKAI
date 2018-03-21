@@ -25,6 +25,7 @@ var mode_minimax = function() {
   mode_minimax.init = function() {
 
     // clean up
+    mutex.force_release();    
     objects.clear();
 
     // set random seed, for easier debugging
