@@ -129,6 +129,98 @@ var astar = function() {
   // A STAR
   // ------------------------------------------------------------------------------------------
   
+  astar.get_path_from_to = function(source_tile, destination_tile) {
+    if(!source_tile.is_type("free")) {
+      console.log("invalid source", source_tile.col, source_tile.row);
+      return;
+    }
+    if(!destination_tile.is_type("free")) {
+      console.log("invalid destination", destination_tile.col, destination_tile.row);
+      return;
+    }
+
+    // in order to move, we'll need a path to follow
+    var path = [];
+
+    // to calculate the path we'll need to store some per-tile values, like their cost
+    // but for this implementation I'm storing them inside the tile objects for simplicity
+    // a cleaner implementation would encapsulate the tiles within a "path state" object
+    source_tile.current_cost = 0;
+    source_tile.estimated_total_cost = source_tile.distance_to(destination_tile); 
+    var open = [ source_tile ];
+    source_tile.set_type("open");
+
+    while(open.length > 0) {
+      var tile = open.shift();
+
+      // have we reached our destination ?
+      if(tile === destination_tile) {
+        // read back the path
+        while(tile) {
+          tile.set_type("path");
+          path.unshift(tile);
+          tile = tile.previous;
+        }
+
+        // time to stop
+        open.length = 0;
+      }
+      else {
+        tile.map_neighbours("4", function(n) {
+          if(n.is_type("wall")) {
+            // impassible tile
+            return;
+          }
+          else {
+            var estimated_remaining_cost = n.estimated_remaining_cost || n.distance_to(destination_tile);
+            var new_estimated_total_cost = tile.current_cost + 1 + n.distance_to(destination_tile);
+            
+            var change_previous = false;
+
+            if(n.is_type("free")) {
+              // new tile that has not yet been examined
+              change_previous = true;
+              n.set_type("open");
+              open.push(n);
+            }
+            else if(n.is_type("open")) {
+              // tile that was previously examined, but this path might be better
+              change_previous = (new_estimated_total_cost < n.estimated_total_cost); 
+            }
+
+            if(change_previous) {
+              n.previous = tile;
+              n.current_cost = tile.current_cost + 1;
+              n.estimated_remaining_cost = estimated_remaining_cost;
+              n.estimated_total_cost = new_estimated_total_cost; 
+            }
+          }
+        });
+
+        // make sure we don't explore things twice
+        tile.set_type("closed");
+      }
+
+      // this sorting is the key: we explore the most promising frontiers first
+      open.sort(function(a, b) {
+        return (a.estimated_total_cost - b.estimated_total_cost);
+      });
+    }
+
+    // clean up
+    grid.map(function(tile) {
+      if(!tile.is_type("wall")) {
+        delete tile.previous
+        delete tile.current_cost
+        delete tile.estimated_total_cost
+        delete tile.estimated_remaining_cost
+        if(!tile.is_type("path")) {
+          tile.set_type("free");
+        }
+      }
+    });    
+  }
+
   astar.move_to = function*(args) {
     var destination_tile = args.destination;
     useful.assert(destination_tile, "a destination must be specified");

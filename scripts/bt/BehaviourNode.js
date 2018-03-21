@@ -29,7 +29,17 @@ var BehaviourNode = function() {
   var BehaviourNode = function(args) {
 
     // check parameters
-    useful.copy_entries(args, this, [ "parent" ]);
+    useful.copy_entries(args, this, [ "parent", "name" ]);
+    if(args.update) {
+      // custom update
+      this.update = args.update;
+    }
+    
+    // add to parent
+    this.parent.add_child(this);
+    
+    // create child list
+    this.children = [];
 
     // globally unique identifier
     this.hash = _next_guid;
@@ -40,16 +50,12 @@ var BehaviourNode = function() {
   }
 
   // ------------------------------------------------------------------------------------------
-  // ACCESS
+  // CHILDREN
   // ------------------------------------------------------------------------------------------
-  
-  // ------------------------------------------------------------------------------------------
-  // UPDATE
-  // ------------------------------------------------------------------------------------------
-    
-  BehaviourNode.prototype.update = function(dt) {
-    this.current_node.update(dt);      
-  };
+
+  BehaviourNode.prototype.add_child = function(child) {
+    this.children.push(child);
+  }
   
   // ------------------------------------------------------------------------------------------
   // EXPORT

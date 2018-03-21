@@ -76,49 +76,86 @@ var mode_bt = function() {
         useful.assert(berry_tile, "it should be possible to find valid tiles to receive berries");
         new Berry({
           tile : berry_tile
-        })
+        });
+
+        if(i % 100) {
+          yield * babysitter.waitForNextFrame();             
+        }
       }
 
       // create behaviour tree
-      var root = new BehaviourTree({
+      var behaviour_tree = new BehaviourTree({
       });
         var main_selector = new SelectorNode({
-          parent : root
+          name : "main_selector",
+          parent : behaviour_tree
         });
           var carry_check = new BehaviourNode({
+            name : "carry_check",
             parent : main_selector,
             update : function(dt) {
-
+              if(caveman.has_berry) {
+                return this.children[0].update(dt);
+              }
+              else {
+                return BehaviourTree.FAILURE;
+              }
             }
           });
             var eat_sequence = new SequenceNode({
+              name : "eat_sequence",
               parent : carry_check
             });
               var go_home = new BehaviourNode({
+                name : "go_home",
                 parent : eat_sequence,
                 update : function(dt) {
 
                 }
               });
               var eat_food = new BehaviourNode({
+                name : "eat_food",
                 parent : eat_sequence,
                 update : function(dt) {
-
+                  caveman.has_berry = false;
+                  return BehaviourTree.SUCCESS;
                 }
               });
           var berry_check = new BehaviourNode({
+            name : "berry_check",
             parent : main_selector,
             update : function(dt) {
-
+              var near_berry = caveman.tile.any_neighbours("4", function(n) {
+                return n.contents && n.contents.is_berry;
+              });
+              if(near_berry) {
+                return this.children[0].update(dt);
+              }
+              else {
+                return BehaviourTree.FAILURE;
+              }
             }
           });
-            var get_berries = new BehaviourNode({
-              parent : eat_sequence,
+            var harvest_berry = new BehaviourNode({
+              name : "harvest_berry",
+              parent : berry_check,
               update : function(dt) {
-              
+                caveman.map_neighbours("4", function(n) {
+                  if(n.contents && n.contents.is_berry) {
+                    n.contents.purge = true;
+                    caveman.has_berry = true;
+                  }
+                });
+                if(caveman.has_berry) {
+                  return BehaviourTree.SUCCESS;
+                }
+                else {
+                  return BehaviourTree.FAILURE;
+                }
               }
             });
-          var roam = new BehaviourNode({
+          var find_berry = new BehaviourNode({
+            name : "find_berry",
             parent : main_selector,
             update : function(dt) {
 
@@ -137,6 +174,7 @@ var mode_bt = function() {
         var dt = deltaTime / 1000;
 
         // tick behaviour tree
+        behaviour_tree.update(dt);
 
         // update objects
         objects.update(dt);

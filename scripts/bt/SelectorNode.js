@@ -25,23 +25,32 @@ var SelectorNode = function() {
   // ------------------------------------------------------------------------------------------
 
   var SelectorNode = function(args) {
-    args.update = SelectorNode.prototype.update;
     BehaviourNode.call(this, args);
 
     // done
     return this;
   }
+  SelectorNode.prototype.add_child = BehaviourNode.prototype.add_child;
 
-  // ------------------------------------------------------------------------------------------
-  // ACCESS
-  // ------------------------------------------------------------------------------------------
-  
+
   // ------------------------------------------------------------------------------------------
   // UPDATE
   // ------------------------------------------------------------------------------------------
     
   SelectorNode.prototype.update = function(dt) {
-    this.current_node.update(dt);      
+    for(var i = 0; i < this.children.length; i++) {
+      var result = this.children[i].update(dt);
+      if(result === BehaviourTree.SUCCESS) {
+        // any success is a success of the selector
+        return BehaviourTree.SUCCESS;
+      }
+      else if (result === BehaviourTree.RUNNING) {
+        return BehaviourTree.RUNNING;
+      }
+    }
+
+    // nothing has worked
+    return BehaviourTree.FAILURE;
   };
   
   // ------------------------------------------------------------------------------------------

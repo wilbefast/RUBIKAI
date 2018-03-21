@@ -27,33 +27,43 @@ var BehaviourTree = function() {
   
   var _next_guid = 1;  
   var BehaviourTree = function(args) {
+    // check parameters
+    useful.copy_entries(args, this, [ ]);
 
-      // check parameters
-      useful.copy_entries(args, this, [ ]);
+    // globally unique identifier
+    this.hash = _next_guid;
+    _next_guid++;
 
-      // globally unique identifier
-      this.hash = _next_guid;
-      _next_guid++;
-
-      // done
-      return this;
-    }
-
-    // ------------------------------------------------------------------------------------------
-    // ACCESS
-    // ------------------------------------------------------------------------------------------
+    // done
+    return this;
+  }
     
-    // ------------------------------------------------------------------------------------------
-    // UPDATE
-    // ------------------------------------------------------------------------------------------
-     
-    BehaviourTree.prototype.update = function(dt) {
-      this.current_node.update(dt);      
-    };
-    
-    // ------------------------------------------------------------------------------------------
-    // EXPORT
-    // ------------------------------------------------------------------------------------------
+  BehaviourTree.SUCCESS = 1;
+  BehaviourTree.FAILURE = 2;
+  BehaviourTree.RUNNING = 3;
+  
 
-    return BehaviourTree;
+  // ------------------------------------------------------------------------------------------
+  // CHILDREN
+  // ------------------------------------------------------------------------------------------
+
+  BehaviourTree.prototype.add_child = function(child) {
+    useful.assert(this.root === undefined, "there can only be one root node");
+    this.root = child;
+  }
+
+  // ------------------------------------------------------------------------------------------
+  // UPDATE
+  // ------------------------------------------------------------------------------------------
+    
+  BehaviourTree.prototype.update = function(dt) {
+    useful.assert(this.root, "there must be a root node");
+    this.root.update(dt);      
+  };
+  
+  // ------------------------------------------------------------------------------------------
+  // EXPORT
+  // ------------------------------------------------------------------------------------------
+
+  return BehaviourTree;
 }();

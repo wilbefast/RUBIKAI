@@ -25,23 +25,31 @@ var SequenceNode = function() {
   // ------------------------------------------------------------------------------------------
 
   var SequenceNode = function(args) {
-    args.update = SequenceNode.prototype.update;    
     BehaviourNode.call(this, args);
 
     // done
     return this;
   }
-
-  // ------------------------------------------------------------------------------------------
-  // ACCESS
-  // ------------------------------------------------------------------------------------------
+  SequenceNode.prototype.add_child = BehaviourNode.prototype.add_child;
   
   // ------------------------------------------------------------------------------------------
   // UPDATE
   // ------------------------------------------------------------------------------------------
     
   SequenceNode.prototype.update = function(dt) {
-    this.current_node.update(dt);      
+    for(var i = 0; i < this.children.length; i++) {
+      var result = this.children[i].update(dt);
+      if(result === BehaviourTree.FAILURE) {
+        // any failure is a failure of the sequence
+        return BehaviourTree.FAILURE;
+      }
+      else if (result === BehaviourTree.RUNNING) {
+        return BehaviourTree.RUNNING;
+      }
+    }
+
+    // nothing has worked
+    return BehaviourTree.FAILURE;
   };
   
   // ------------------------------------------------------------------------------------------
