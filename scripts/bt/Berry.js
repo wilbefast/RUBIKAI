@@ -28,8 +28,6 @@ var Berry = function() {
   var Berry = function(args) {
     TileObject.call(this, args);
 
-    Berry.count++;
-
     // done
     return this;
   }
@@ -42,6 +40,10 @@ var Berry = function() {
   // UPDATE
   // ------------------------------------------------------------------------------------------
     
+  Berry.prototype.update = function(dt) {
+
+  }
+
   Berry.prototype.draw = function(dt) {
     ctx.fillStyle = "purple";
     ctx.beginPath();

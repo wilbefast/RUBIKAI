@@ -152,7 +152,7 @@ var astar = function() {
       if(tile.contents && tile.contents.is_berry) {
         // read back the path
         tile = tile.previous;
-        while(tile) {
+        while(tile && tile !== source_tile) {
           path.unshift(tile);
           tile = tile.previous;
         }
@@ -194,7 +194,7 @@ var astar = function() {
 
     // clean up
     grid.map(function(tile) {
-      if(!tile.is_type("wall")) {
+      if(!tile.is_type("wall") && !tile.is_type("caveman_home")) {
         delete tile.previous
         delete tile.current_cost
         delete tile.estimated_total_cost
@@ -235,7 +235,7 @@ var astar = function() {
       // have we reached our destination ?
       if(tile === destination_tile) {
         // read back the path
-        while(tile) {
+        while(tile && tile !== source_tile) {
           path.unshift(tile);
           tile = tile.previous;
         }
@@ -287,7 +287,7 @@ var astar = function() {
 
     // clean up
     grid.map(function(tile) {
-      if(!tile.is_type("wall")) {
+      if(!tile.is_type("wall") && !tile.is_type("caveman_home")) {
         delete tile.previous
         delete tile.current_cost
         delete tile.estimated_total_cost

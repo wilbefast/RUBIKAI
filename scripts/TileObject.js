@@ -29,10 +29,7 @@ var TileObject = function() {
 
     // check parameters
     useful.copy_entries(args, this, [ "tile" ]);
-    useful.assert(!this.tile.contents && this.tile.is_type("free"), "tile objects must spawn on free tile");
-    this.tile.contents = this;
-    this.draw_x = this.tile.draw_x + this.tile.draw_w*0.5;
-    this.draw_y = this.tile.draw_y + this.tile.draw_h*0.5;
+    this.set_tile(this.tile);
  
     // globally unique identifier
     this.hash = _next_guid;
@@ -51,9 +48,13 @@ var TileObject = function() {
   }
 
   TileObject.prototype.set_tile = function(new_tile) {
-    useful.assert(!new_tile.contents, "new tile should be free");
-    this.tile.contents = null;
+    useful.assert(!new_tile.contents && new_tile.is_type("free"), "new tile should be free");
+    if(this.tile) {
+      this.tile.contents = null;
+    }
     new_tile.contents = this;
+    this.draw_x = new_tile.draw_x + new_tile.draw_w*0.5;
+    this.draw_y = new_tile.draw_y + new_tile.draw_h*0.5;
     this.tile = new_tile;
   }
   

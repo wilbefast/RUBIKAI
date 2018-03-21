@@ -45,23 +45,23 @@ var mode_bt = function() {
       verbose : true
     });
 
-    // create bot
+    // set up AI caveman
     babysitter.add(function*() {
 
       yield * mutex.claim();
 
       // create the caveman's house
-      var caveman_tile = grid.get_random_tile(function(tile) {
+      var caveman_home_tile = grid.get_random_tile(function(tile) {
         return tile.is_type("free") && tile.all_neighbours("8", function(n) {
           return n.is_type("free");
         });
       });
-      useful.assert(caveman_tile, "there must be a tile for the player to spawn on");
-      caveman_tile.set_type("caveman_home");
+      useful.assert(caveman_home_tile, "there must be a tile for the player to spawn on");
+      caveman_home_tile.set_type("caveman_home");
       yield * babysitter.waitForSeconds(0.5);
 
       // create the caveman
-      caveman_tile = caveman_tile.map_neighbours("4", function(n) {
+      var caveman_tile = caveman_home_tile.map_neighbours("4", function(n) {
         return n;
       });
       var caveman = new Caveman({
@@ -80,7 +80,7 @@ var mode_bt = function() {
         });
 
         if(i % 2000) {
-          yield * babysitter.waitForNextFrame();             
+          //yield * babysitter.waitForNextFrame();             
         }
       }
 
@@ -111,7 +111,28 @@ var mode_bt = function() {
                 name : "go_home",
                 parent : eat_sequence,
                 update : function(dt) {
-                  console.log("going home");
+
+                  if(!caveman.path) {
+                    console.log("going home berry");
+                    caveman.path = astar.get_path_from_to(caveman.tile, caveman_home_tile);
+                    caveman.timer = 1;
+                  }
+                  else if (caveman.path.length < 1) {
+                    console.log("finished going home");
+                    caveman.path = null;
+                    return BehaviourTree.SUCCESS;
+                  }
+                  else {
+                    caveman.timer -= dt;
+                    if(caveman.timer < 0) {
+                      var new_tile = caveman.path.shift();
+                      if(new_tile.contents) {
+                        console.warn(new_tile.contents);
+                      }
+                      caveman.set_tile(new_tile);
+                    }
+                  }
+    
                   return BehaviourTree.RUNNING;
                 }
               });
@@ -119,9 +140,14 @@ var mode_bt = function() {
                 name : "eat_food",
                 parent : eat_sequence,
                 update : function(dt) {
-                  caveman.has_berry = false;
-                  console.log("ate berry")
-                  return BehaviourTree.SUCCESS;
+                  if(!caveman.has_berry) {
+                    return BehaviourTree.FAILURE;                    
+                  }
+                  else {
+                    caveman.has_berry = false;
+                    console.log("ate berry")
+                    return BehaviourTree.SUCCESS;
+                  }
                 }
               });
           var berry_check = new BehaviourNode({
@@ -143,6 +169,7 @@ var mode_bt = function() {
               name : "harvest_berry",
               parent : berry_check,
               update : function(dt) {
+                console.log("harvesting berry")
                 caveman.tile.map_neighbours("4", function(n) {
                   if(n.contents && n.contents.is_berry) {
                     n.contents.purge = true;
@@ -167,7 +194,7 @@ var mode_bt = function() {
                 caveman.path = astar.get_path_to_berry(caveman.tile);
                 caveman.timer = 1;
               }
-              else if (caveman.path.length == 0) {
+              else if (caveman.path.length < 1) {
                 console.log("finished finding berry");
                 caveman.path = null;
                 return BehaviourTree.SUCCESS;
@@ -176,6 +203,9 @@ var mode_bt = function() {
                 caveman.timer -= dt;
                 if(caveman.timer < 0) {
                   var new_tile = caveman.path.shift();
+                  if(new_tile.contents) {
+                    console.warn(new_tile.contents);
+                  }
                   caveman.set_tile(new_tile);
                 }
               }
@@ -186,9 +216,7 @@ var mode_bt = function() {
 
       // keep updating until there are no berries left
       var lastFrameTime = Date.now();
-      while(!caveman.has_berry || objects.any(function(object) {
-        return object.is_berry;
-      })) {
+      while(!caveman.has_berry || objects.update_list.length > 1) {
         // calculate dt
         var thisFrameTime = Date.now();
         var deltaTime = thisFrameTime - lastFrameTime;
@@ -205,7 +233,8 @@ var mode_bt = function() {
         yield * babysitter.waitForNextFrame();
       }
 
-      // done
+      // done      
+      console.log("caveman has eaten all the berries");
       yield * mutex.release();
     });
   }

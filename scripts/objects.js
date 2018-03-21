@@ -105,6 +105,16 @@ var objects = function() {
     return false;
   }
   
+  objects.count = function(predicate) {
+    console.log(objects.u)
+    var count = 0;
+    for(var i = 0; i < objects.update_list.length; i++) {
+      if(!predicate || predicate(objects.update_list[i], i))
+        return count++;
+    }
+    return count;
+  }
+
   // ------------------------------------------------------------------------------------------
   // EXPORT
   // ------------------------------------------------------------------------------------------
