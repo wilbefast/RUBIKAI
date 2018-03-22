@@ -15,47 +15,55 @@ Lesser General Public License for more details.
 "use strict";
 
 // ----------------------------------------------------------------------------
-// SELECTOR BEHAVIOUR NODE CLASS
+// "GO TO NEAREST" ACTION BEHAVIOUR NODE CLASS
 // ----------------------------------------------------------------------------
 
-var SelectorNode = function() {
+
+var ActionNode_GotoNearest = function() {
 
   // ------------------------------------------------------------------------------------------
   // CONSTRUCTOR
   // ------------------------------------------------------------------------------------------
 
-  var SelectorNode = function(args) {
+  var ActionNode_GotoNearest = function(args) {
     BehaviourNode.call(this, args);
+    // check parameters
+    useful.copy_entries(args, this, [ "such_that" ])
 
     // done
     return this;
   }
-  SelectorNode.prototype.add_child = BehaviourNode.prototype.add_child;
-
 
   // ------------------------------------------------------------------------------------------
   // UPDATE
   // ------------------------------------------------------------------------------------------
-    
-  SelectorNode.prototype.update = function(dt, args) {
-    for(var i = 0; i < this.children.length; i++) {
-      var result = this.children[i].update(dt, args);
-      if(result === BehaviourTree.SUCCESS) {
-        // any success is a success of the selector
-        return BehaviourTree.SUCCESS;
-      }
-      else if (result === BehaviourTree.RUNNING) {
-        return BehaviourTree.RUNNING;
+
+  ActionNode_GotoNearest.prototype.update = function(dt, args) {
+    if(!args.path) {
+      args.path = astar.get_path_to_any(args.tile, this.such_that);
+      args.timer = 0.5;
+    }
+    else if (args.path.length > 0) {
+      args.timer -= dt;
+      if(args.timer < 0) {
+        var new_tile = args.path.shift();
+        if(new_tile.contents) {
+          console.warn(new_tile.contents);
+        }
+        args.set_tile(new_tile);
+        args.timer += 0.1;                  
       }
     }
-
-    // nothing has worked
-    return BehaviourTree.FAILURE;
-  };
+    else {
+      args.path = null;
+      console.log(this.name, "go to nearest success");
+      return BehaviourTree.SUCCESS;
+    }
+  }
   
   // ------------------------------------------------------------------------------------------
   // EXPORT
   // ------------------------------------------------------------------------------------------
 
-  return SelectorNode;
+  return ActionNode_GotoNearest;
 }();

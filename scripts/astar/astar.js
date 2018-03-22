@@ -129,7 +129,7 @@ var astar = function() {
   // A STAR
   // ------------------------------------------------------------------------------------------
  
-  astar.get_path_to_berry = function(source_tile) {
+  astar.get_path_to_any = function(source_tile, such_that) {
     if(!source_tile.is_type("free")) {
       console.log("invalid source", source_tile.col, source_tile.row);
       return;
@@ -149,9 +149,8 @@ var astar = function() {
       var tile = open.shift();
 
       // have we found a berry ?
-      if(tile.contents && tile.contents.is_berry) {
+      if(such_that(tile)) {
         // read back the path
-        tile = tile.previous;
         while(tile && tile !== source_tile) {
           path.unshift(tile);
           tile = tile.previous;

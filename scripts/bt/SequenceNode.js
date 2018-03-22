@@ -36,9 +36,9 @@ var SequenceNode = function() {
   // UPDATE
   // ------------------------------------------------------------------------------------------
     
-  SequenceNode.prototype.update = function(dt) {
+  SequenceNode.prototype.update = function(dt, args) {
     for(var i = 0; i < this.children.length; i++) {
-      var result = this.children[i].update(dt);
+      var result = this.children[i].update(dt, args);
       if(result === BehaviourTree.FAILURE) {
         // any failure is a failure of the sequence
         return BehaviourTree.FAILURE;
@@ -48,8 +48,9 @@ var SequenceNode = function() {
       }
     }
 
-    // nothing has worked
-    return BehaviourTree.FAILURE;
+    // made it to the end
+    console.log(this.name, "sequence finished")
+    return BehaviourTree.SUCCESS;
   };
   
   // ------------------------------------------------------------------------------------------

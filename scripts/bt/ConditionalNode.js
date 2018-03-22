@@ -15,47 +15,50 @@ Lesser General Public License for more details.
 "use strict";
 
 // ----------------------------------------------------------------------------
-// SELECTOR BEHAVIOUR NODE CLASS
+// CONDITIONAL BEHAVIOUR NODE CLASS
 // ----------------------------------------------------------------------------
 
-var SelectorNode = function() {
+
+var ConditionalNode = function() {
 
   // ------------------------------------------------------------------------------------------
   // CONSTRUCTOR
   // ------------------------------------------------------------------------------------------
 
-  var SelectorNode = function(args) {
+  var ConditionalNode = function(args) {
     BehaviourNode.call(this, args);
+    // check parameters
+    useful.copy_entries(args, this, [ "predicate" ])
 
     // done
     return this;
   }
-  SelectorNode.prototype.add_child = BehaviourNode.prototype.add_child;
 
+  // ------------------------------------------------------------------------------------------
+  // CHILDREN
+  // ------------------------------------------------------------------------------------------
+
+  ConditionalNode.prototype.add_child = function(child) {
+    useful.assert(!this.child, "Conditional nodes can only have 1 child");
+    this.child = child;
+  }
 
   // ------------------------------------------------------------------------------------------
   // UPDATE
   // ------------------------------------------------------------------------------------------
-    
-  SelectorNode.prototype.update = function(dt, args) {
-    for(var i = 0; i < this.children.length; i++) {
-      var result = this.children[i].update(dt, args);
-      if(result === BehaviourTree.SUCCESS) {
-        // any success is a success of the selector
-        return BehaviourTree.SUCCESS;
-      }
-      else if (result === BehaviourTree.RUNNING) {
-        return BehaviourTree.RUNNING;
-      }
-    }
 
-    // nothing has worked
-    return BehaviourTree.FAILURE;
-  };
+  ConditionalNode.prototype.update = function(dt, args) {
+    if(this.predicate()) {
+      return this.child.update(dt, args);
+    }
+    else {
+      return BehaviourTree.FAILURE;
+    }
+  }
   
   // ------------------------------------------------------------------------------------------
   // EXPORT
   // ------------------------------------------------------------------------------------------
 
-  return SelectorNode;
+  return ConditionalNode;
 }();
