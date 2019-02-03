@@ -48,7 +48,10 @@ var TileObject = function() {
   }
 
   TileObject.prototype.set_tile = function(new_tile) {
-    useful.assert(!new_tile.contents && new_tile.is_pathable(), "new tile should be free");
+    if(new_tile !== this.tile) {
+      useful.assert(!new_tile.contents && new_tile.is_pathable(), "new tile should be free");
+    }
+
     if(this.tile) {
       this.tile.contents = null;
     }

@@ -89,8 +89,10 @@ var qlearning = function() {
         
         // update the Q-Table based on the result of the action and this prediction
         var reward = result.reward;
-        var q = Q[state][action];
-        Q[state][action] = q + learning_ratio*(reward + discount_factor*best_q - q)
+        var q = Q[state][best_action];
+        var new_q = q + learning_ratio*(reward + discount_factor*best_q - q);
+        useful.assert(!isNaN(new_q));
+        Q[state][best_action] = new_q;
         
         // get ready to start again from the new state
         total_reward += result.reward;
@@ -106,6 +108,8 @@ var qlearning = function() {
       epsiode_reward[i] = total_reward;
       epsiode_move_count[i] = n_moves;
     }
+
+    console.log("Finished learning", Q);
   }
   
   // ------------------------------------------------------------------------------------------

@@ -66,7 +66,7 @@ var frozenlake = function() {
   // ------------------------------------------------------------------------------------------
 
   var _get_state_number = function() {
-    return _agent_tile.col + _grid_w*_agent_tile.row;
+    return _agent.tile.col + _grid_w*_agent.tile.row;
   }
 
   // ------------------------------------------------------------------------------------------
@@ -101,7 +101,11 @@ var frozenlake = function() {
   }
 
   frozenlake.take_action = function(action_i) {
-    return _get_state_number();
+    return {
+      state : _get_state_number(),
+      reward : 1,
+      end : _agent.tile.is_type("hole")
+    };
   }
 
   frozenlake.get_max_moves = function() {

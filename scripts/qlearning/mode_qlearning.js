@@ -57,7 +57,7 @@ var mode_qlearning = function() {
       game : frozenlake,
       learning_ratio : 0.8,
       discount_factor : 0.95,
-      n_playthroughs : 2000
+      n_episodes : 2000
     });
   }
 
