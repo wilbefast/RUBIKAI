@@ -60,6 +60,7 @@ var frozenlake = function() {
 
   var _start_tile;
   var _agent;
+  var _randomiser = [-1, 0, 1];
 
   // ------------------------------------------------------------------------------------------
   // PRIVATE FUNCTIONS
@@ -104,10 +105,14 @@ var frozenlake = function() {
     var reward = 0;
     var end = false;
 
+    // we have a chance to move somewhere we don't want
+    var slip = useful.rand_in(_randomiser);
+    action_i = (action_i + slip) % _n_actions
+
     switch(action_i) {
       case 0: _agent.try_move("N"); break;
-      case 1: _agent.try_move("S"); break;
-      case 2: _agent.try_move("E"); break;
+      case 1: _agent.try_move("E"); break;
+      case 2: _agent.try_move("S"); break;
       case 3: _agent.try_move("W"); break;
     }
     
