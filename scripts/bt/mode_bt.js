@@ -188,7 +188,7 @@ var mode_bt = function() {
                   }
                   else {
                     caveman.has_berry = false;
-                    console.log("ate berry")
+                    console.log("ate berry");
                     return BehaviourTree.SUCCESS;
                   }
                 }

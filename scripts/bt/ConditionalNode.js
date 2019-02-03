@@ -49,7 +49,9 @@ var ConditionalNode = function() {
 
   ConditionalNode.prototype.update = function(dt, args) {
     if(this.predicate()) {
-      return this.child.update(dt, args);
+      var result = this.child.update(dt, args);
+      useful.assert(result, "Behaviour tree nodes must return a result");
+      return result;
     }
     else {
       return BehaviourTree.FAILURE;

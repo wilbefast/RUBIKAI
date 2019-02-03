@@ -59,6 +59,7 @@ var BehaviourTree = function() {
   BehaviourTree.prototype.update = function(dt, args) {
     useful.assert(this.root, "there must be a root node");
     var result = this.root.update(dt, args);  
+    useful.assert(result, "Behaviour tree nodes must return a result");
     useful.assert(result === BehaviourTree.SUCCESS || result === BehaviourTree.FAILURE || result === BehaviourTree.RUNNING,
       "The behaviour tree update result can only ever be SUCCESS, FAILURE or RUNNING");    
   };

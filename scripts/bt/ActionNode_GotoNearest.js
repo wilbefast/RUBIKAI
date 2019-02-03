@@ -28,7 +28,7 @@ var ActionNode_GotoNearest = function() {
   var ActionNode_GotoNearest = function(args) {
     BehaviourNode.call(this, args);
     // check parameters
-    useful.copy_entries(args, this, [ "such_that" ])
+    useful.copy_entries(args, this, [ "such_that" ]);
 
     // done
     return this;
@@ -42,8 +42,10 @@ var ActionNode_GotoNearest = function() {
     if(!args.path) {
       args.path = astar.get_path_to_any(args.tile, this.such_that);
       args.timer = 0.5;
+      return BehaviourTree.RUNNING;
     }
-    else if (args.path.length > 0) {
+
+    if (args.path.length > 0) {
       args.timer -= dt;
       if(args.timer < 0) {
         var new_tile = args.path.shift();
@@ -51,8 +53,9 @@ var ActionNode_GotoNearest = function() {
           console.warn(new_tile.contents);
         }
         args.set_tile(new_tile);
-        args.timer += 0.1;                  
+        args.timer += 0.1;         
       }
+      return BehaviourTree.RUNNING;
     }
     else {
       args.path = null;

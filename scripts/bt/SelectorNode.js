@@ -40,6 +40,7 @@ var SelectorNode = function() {
   SelectorNode.prototype.update = function(dt, args) {
     for(var i = 0; i < this.children.length; i++) {
       var result = this.children[i].update(dt, args);
+      useful.assert(result, "Behaviour tree nodes must return a result");      
       if(result === BehaviourTree.SUCCESS) {
         // any success is a success of the selector
         return BehaviourTree.SUCCESS;
