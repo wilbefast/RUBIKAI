@@ -40,7 +40,7 @@ var astar = function() {
       });
     });
     useful.assert(player_tile, "there must be a tile for the player to spawn on");
-    player_tile.set_type("blue_player");
+    player_tile.set_type("player");
 
     // remember the player position
     _player_tile = player_tile;
@@ -161,7 +161,7 @@ var astar = function() {
       }
       else {
         tile.map_neighbours("4", function(n) {
-          if(n.is_type("wall") || n.is_type("caveman_home")) {
+          if(!n.is_pathable()) {
             // impassible tile
             return;
           }
@@ -193,7 +193,7 @@ var astar = function() {
 
     // clean up
     grid.map(function(tile) {
-      if(!tile.is_type("wall") && !tile.is_type("caveman_home")) {
+      if(tile.is_pathable()) {
         delete tile.previous
         delete tile.current_cost
         delete tile.estimated_total_cost
@@ -244,7 +244,7 @@ var astar = function() {
       }
       else {
         tile.map_neighbours("4", function(n) {
-          if(n.is_type("wall") || n.is_type("caveman_home")) {
+          if(!n.is_pathable()) {
             // impassible tile
             return;
           }
@@ -286,7 +286,7 @@ var astar = function() {
 
     // clean up
     grid.map(function(tile) {
-      if(!tile.is_type("wall") && !tile.is_type("caveman_home")) {
+      if(tile.is_pathable()) {
         delete tile.previous
         delete tile.current_cost
         delete tile.estimated_total_cost
@@ -400,13 +400,13 @@ var astar = function() {
         }
       }
     });
-    _player_tile.set_type("blue_player");
+    _player_tile.set_type("player");
 
     // follow path
     while(path.length > 0) {
       _player_tile.set_type("free");
       _player_tile = path.shift();
-      _player_tile.set_type("blue_player");
+      _player_tile.set_type("player");
       yield * babysitter.waitForSeconds(0.05);      
     }
 

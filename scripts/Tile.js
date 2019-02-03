@@ -45,39 +45,7 @@ var Tile = function() {
   // ------------------------------------------------------------------------------------------
   
   Tile.prototype.tile_types = {
-    wall : {
-      name : "wall",
-      is_pathable : false,
-      colour : "#003f34"
-    },
-    free : {
-      name : "free",
-      colour : "white"      
-    },
-    open : {
-      name : "open",
-      colour : "lime"    
-    },
-    closed : {
-      name : "closed",
-      colour : "yellow"    
-    },
-    path : {
-      name : "path",
-      colour : "tan"
-    },
-    red_player : {
-      name : "red_player",
-      colour : "red"    
-    },
-    blue_player : {
-      name : "blue_player",
-      colour : "blue"      
-    },
-    caveman_home : {
-      name : "caveman_home",
-      colour : "brown"
-    }
+    // initialise this with the specific stuff you need for the mode
   }
 
   Tile.prototype.set_type = function(type_name) {
@@ -93,6 +61,10 @@ var Tile = function() {
 
   Tile.prototype.mimic_type_from = function(other_tile) {
     return this.tile_type = other_tile.tile_type;
+  }
+
+  Tile.prototype.is_pathable = function() {
+    return (this.tile_type.is_pathable === undefined) || (this.tile_type.is_pathable === true);
   }
 
   // ------------------------------------------------------------------------------------------

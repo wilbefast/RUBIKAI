@@ -41,7 +41,7 @@ var main = function() {
   // INITIAL MODE
   // ----------------------------------------------------------------------------
 
-  mode = mode_bt;
+  mode = mode_qlearning;
   mode.init();
 
   // ----------------------------------------------------------------------------
@@ -91,6 +91,9 @@ var main = function() {
       ctx.translate(ctx.off_x + 0.5, ctx.off_y + 0.5); // the 0.5 prevents blurred lines
       grid.draw();
       objects.draw();
+      if(mode.draw) {
+        mode.draw();
+      }
       cursor.draw();
     ctx.restore();
 

@@ -26,6 +26,8 @@
   <script type="text/javascript" src="scripts/bt/SelectorNode.js" defer="true"></script>
   <script type="text/javascript" src="scripts/bt/BehaviourTree.js" defer="true"></script>
   <script type="text/javascript" src="scripts/bt/mode_bt.js" defer="true"></script>
+  <script type="text/javascript" src="scripts/qlearning/frozen_lake.js" defer="true"></script>  
+  <script type="text/javascript" src="scripts/qlearning/mode_qlearning.js" defer="true"></script>
   <script type="text/javascript" src="scripts/main.js" defer="true"></script>
   <script type="text/javascript">
     window.onload = function() {
@@ -44,6 +46,7 @@
       <button onclick="babysitter.clear(); mode = mode_astar; mode.init();">A* demo</button>
       <button onclick="babysitter.clear(); mode = mode_minimax; mode.init();">Minimax demo</button>
       <button onclick="babysitter.clear(); mode = mode_bt; mode.init();">Behaviour Tree demo</button>
+      <button onclick="babysitter.clear(); mode = mode_qlearning; mode.init();">Q-learning demo</button>
     </div>
 
     <div style="display:none">

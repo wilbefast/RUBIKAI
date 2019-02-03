@@ -1,5 +1,5 @@
 /*
-(C) Copyright 2018 William Dyce
+(C) Copyright 2019 William Dyce
 
 All rights reserved. This program and the accompanying materials
 are made available under the terms of the GNU Lesser General Public License
@@ -27,6 +27,36 @@ var mode_bt = function() {
     // clean up
     mutex.force_release();
     objects.clear();
+
+    // set tile types
+    Tile.prototype.tile_types = {
+      wall : {
+        name : "wall",
+        is_pathable : false,
+        colour : "#003f34"
+      },
+      free : {
+        name : "free",
+        colour : "white"      
+      },
+      open : {
+        name : "open",
+        colour : "lime"    
+      },
+      closed : {
+        name : "closed",
+        colour : "yellow"    
+      },
+      path : {
+        name : "path",
+        colour : "tan"
+      },
+      caveman_home : {
+        name : "caveman_home",
+        is_pathable : false,
+        colour : "brown"
+      }
+    }    
 
     // set random seed, for easier debugging
     Math.seedrandom('Two household, both alike in dignity.');
@@ -84,6 +114,7 @@ var mode_bt = function() {
         }
       }
 
+      /*
       // create the bear
       var bear_tile = grid.get_random_tile(function(tile) {
         return !tile.contents && tile.is_type("free") && tile.all_neighbours("8", function(n) {
@@ -119,6 +150,7 @@ var mode_bt = function() {
         }
       });
       yield * babysitter.waitForSeconds(0.25);     
+      */
 
       // create behaviour tree
       var behaviour_tree = new BehaviourTree({

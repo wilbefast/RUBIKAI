@@ -1,5 +1,5 @@
 /*
-(C) Copyright 2018 William Dyce
+(C) Copyright 2019 William Dyce
 
 All rights reserved. This program and the accompanying materials
 are made available under the terms of the GNU Lesser General Public License
@@ -27,6 +27,35 @@ var mode_astar = function() {
     // clean up
     mutex.force_release();    
     objects.clear();
+
+    // set tile types
+    Tile.prototype.tile_types = {
+      wall : {
+        name : "wall",
+        is_pathable : false,
+        colour : "#003f34"
+      },
+      free : {
+        name : "free",
+        colour : "white"      
+      },
+      open : {
+        name : "open",
+        colour : "lime"    
+      },
+      closed : {
+        name : "closed",
+        colour : "yellow"    
+      },
+      path : {
+        name : "path",
+        colour : "tan"
+      },
+      player : {
+        name : "player",
+        colour : "blue"      
+      }
+    }   
 
     // set random seed, for easier debugging
     Math.seedrandom('To be or not to be, that is the question.');

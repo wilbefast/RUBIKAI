@@ -53,7 +53,7 @@ var minimax = function() {
     // mark initial options
     var options = _get_options(grid, _current_player);
     for(var i = 0; i < options.length; i++) {
-      options[i].set_type("open");
+      options[i].set_type("option");
     }
   }
 
@@ -129,7 +129,7 @@ var minimax = function() {
   var _is_game_over = function(local_grid) {
     useful.assert(local_grid, "a grid must be specified");
     return !local_grid.map(function(tile) {
-      return tile.is_type("open") 
+      return tile.is_type("option") 
     });
   }
 
@@ -148,7 +148,7 @@ var minimax = function() {
   var _is_valid_option = function(tile, player) {
     useful.assert(tile, "a tile must be specified");
     useful.assert(player, "a player must be specified");
-    return (tile.is_type("free") || tile.is_type("open")) && _can_flip_any_line(tile, player);
+    return (tile.is_type("free") || tile.is_type("option")) && _can_flip_any_line(tile, player);
   }
 
   var _get_options = function(local_grid, player) {
@@ -166,7 +166,7 @@ var minimax = function() {
 
   var _try_apply_option = function(tile, player) {
     // check that this is a legal move
-    if(!tile.is_type("open")) {
+    if(!tile.is_type("option")) {
       return false;
     }
     
@@ -179,9 +179,9 @@ var minimax = function() {
     var next_player = _other_player[player];    
     local_grid.map(function(t) {
       if(_is_valid_option(t, next_player)) {
-        t.set_type("open");
+        t.set_type("option");
       }
-      else if(t.is_type("open")) {
+      else if(t.is_type("option")) {
         t.set_type("free");
       }
     });

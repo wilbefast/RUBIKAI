@@ -1,5 +1,5 @@
 /*
-(C) Copyright 2018 William Dyce
+(C) Copyright 2019 William Dyce
 
 All rights reserved. This program and the accompanying materials
 are made available under the terms of the GNU Lesser General Public License
@@ -27,6 +27,26 @@ var mode_minimax = function() {
     // clean up
     mutex.force_release();    
     objects.clear();
+
+    // set tile types
+    Tile.prototype.tile_types = {
+      free : {
+        name : "free",
+        colour : "white"      
+      },
+      option : {
+        name : "option",
+        colour : "lime"    
+      },
+      red_player : {
+        name : "red_player",
+        colour : "red"    
+      },
+      blue_player : {
+        name : "blue_player",
+        colour : "blue"      
+      },
+    }
 
     // set random seed, for easier debugging
     Math.seedrandom('Once more into the breach dear friends.');
