@@ -51,7 +51,7 @@ var TileObject = function() {
     if(new_tile !== this.tile) {
       useful.assert(!new_tile.contents && new_tile.is_pathable(), "new tile should be free");
     }
-
+    
     if(this.tile) {
       this.tile.contents = null;
     }
@@ -59,6 +59,17 @@ var TileObject = function() {
     this.draw_x = new_tile.draw_x + new_tile.draw_w*0.5;
     this.draw_y = new_tile.draw_y + new_tile.draw_h*0.5;
     this.tile = new_tile;
+  }
+
+  TileObject.prototype.try_move = function(direction) {
+    var new_tile = this.tile[direction];
+    if(new_tile) {
+      this.set_tile(new_tile);
+      return true;
+    }
+    else {
+      return false;
+    }
   }
   
   // ------------------------------------------------------------------------------------------

@@ -23,7 +23,7 @@ var qlearning = function() {
   var qlearning = {
   };
   
-  qlearning.play = function(args) {
+  qlearning.play = function *(args) {
     // unpacks arguments
     const learning_ratio = args.learning_ratio;
     const discount_factor = args.discount_factor;
@@ -32,6 +32,7 @@ var qlearning = function() {
     const max_moves = game.get_max_moves();
     const n_states = game.get_state_count();
     const n_actions = game.get_action_count();
+    const verbose = args.verbose;
 
     // initialise the game
     game.init();
@@ -50,32 +51,50 @@ var qlearning = function() {
     // avoid allocating too much memory by creating arrays all the time
     var noise = new Array(n_actions);
   
-    // create lists to contain total rewards and moves per epsiode
-    var epsiode_reward = new Array(n_episodes);
-    var epsiode_move_count = new Array(n_episodes);
+    // create lists to contain total rewards and moves per episode
+    var episode_reward = new Array(n_episodes);
+    var episode_move_count = new Array(n_episodes);
   
-    for(var i = 0; i < n_episodes; i++) {
+    var episode = 0;
+    var finished_learning = false;
+    while(true) {
       // reset the gamestate
       var state = game.reset();
       var total_reward = 0;
       var n_moves = 0;
+
+      // take a moment to contemplate life
+      if(finished_learning) {
+        yield * babysitter.waitForSeconds(0.25);      
+      }
+      else if(verbose) {
+        yield * babysitter.waitForNextFrame(); 
+      }
   
       // the Q-table learning algorithm
-      while(n_moves++ < max_moves) {
+      var gameover = false;
+      while(!gameover && (n_moves++ < max_moves)) {
         // pick the best action based on randomly exploring and exploiting the Q-table
         // we start by exploring a lot, but gradually explore less and exploit Q more
-        var exploration_factor = 1.0 / (i + 1);
+        var exploration_factor = 1.0 / (episode + 1);
         var best_q = -Infinity;
         var best_action = 0;
-        for(var action = 0; i < n_actions; i++) {
+        for(var action = 0; action < n_actions; action++) {
           var q = Q[state][action] + Math.random()*exploration_factor;
           if(q > best_q) {
             best_action = action;
+            best_q = q;
           }
         }
   
         // take the chosen action and find out what happens
         var result = game.take_action(best_action);
+        if(finished_learning) {
+          yield * babysitter.waitForSeconds(0.1);      
+        }
+        else if(verbose) {
+          yield * babysitter.waitForNextFrame(); 
+        }
         var new_state = result.state;
         
         // get (according to Q) the value of the best action given the new state
@@ -98,18 +117,34 @@ var qlearning = function() {
         total_reward += result.reward;
         state = new_state;
         
-        // stop if you fall in a hole and die
-        if (result.end) {
-          break;
-        }
+        // stop if you fall in a hole or reach the objective
+        gameover = result.end;
       }
   
       // we track the number of moves and the reward to see whether we're getting better
-      epsiode_reward[i] = total_reward;
-      epsiode_move_count[i] = n_moves;
-    }
+      episode_reward[episode] = total_reward;
+      episode_move_count[episode] = n_moves;
+      episode++;
 
-    console.log("Finished learning", Q);
+      // have we finished learning?
+      if(!finished_learning && episode > n_episodes) {
+        // log results
+        console.log("Q after learning", Q);
+        console.log("Reward for each episode", episode_reward);
+        console.log("Move count for each episode", episode_move_count);
+
+        // time to show off our work
+        finished_learning = true;
+      }
+
+      // take a moment to contemplate life
+      if(finished_learning) {
+        yield * babysitter.waitForSeconds(0.25);      
+      }
+      else if(verbose) {
+        yield * babysitter.waitForNextFrame(); 
+      }
+    }
   }
   
   // ------------------------------------------------------------------------------------------

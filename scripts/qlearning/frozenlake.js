@@ -101,10 +101,28 @@ var frozenlake = function() {
   }
 
   frozenlake.take_action = function(action_i) {
+    var reward = 0;
+    var end = false;
+
+    switch(action_i) {
+      case 0: _agent.try_move("N"); break;
+      case 1: _agent.try_move("S"); break;
+      case 2: _agent.try_move("E"); break;
+      case 3: _agent.try_move("W"); break;
+    }
+    
+    if(_agent.tile.is_type("goal")) {
+      reward = 1;
+      end = true;
+    }
+    else if(_agent.tile.is_type("hole")) {
+      end = true;
+    }
+    
     return {
       state : _get_state_number(),
-      reward : 1,
-      end : _agent.tile.is_type("hole")
+      reward : reward,
+      end : end
     };
   }
 

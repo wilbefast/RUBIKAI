@@ -52,8 +52,8 @@ var mode_qlearning = function() {
     // set random seed, for easier debugging
     Math.seedrandom('They would be able to converse with each other to sharpen their wits.');
 
-    // create the game we're going to learn to play
-    qlearning.play({
+    // learn to walk
+    babysitter.add(qlearning.play, {
       game : frozenlake,
       learning_ratio : 0.8,
       discount_factor : 0.95,

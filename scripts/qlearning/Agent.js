@@ -35,6 +35,7 @@ var Agent = function() {
 
   Agent.prototype.set_tile = TileObject.prototype.set_tile; 
   Agent.prototype.on_purge = TileObject.prototype.on_purge; 
+  Agent.prototype.try_move = TileObject.prototype.try_move; 
 
 
   // ------------------------------------------------------------------------------------------
