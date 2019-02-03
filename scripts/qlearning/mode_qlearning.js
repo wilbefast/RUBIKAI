@@ -20,10 +20,6 @@ Lesser General Public License for more details.
 
 var mode_qlearning = function() {
 
-  var _agent_tile;
-  var _agent_draw_x;
-  var _agent_draw_y;
-
   var mode_qlearning = {
   }
 
@@ -56,30 +52,13 @@ var mode_qlearning = function() {
     // set random seed, for easier debugging
     Math.seedrandom('They would be able to converse with each other to sharpen their wits.');
 
-    // create a small grid for the 'frozen lake'
-    grid = new Grid({
-      n_cols : 4,
-      n_rows : 4,
-      tile_class : Tile,
-      tile_draw_w : 128,
-      tile_draw_h : 128
+    // create the game we're going to learn to play
+    qlearning.play({
+      game : frozenlake,
+      learning_ratio : 0.8,
+      discount_factor : 0.95,
+      n_playthroughs : 2000
     });
-    _agent_tile = grid.grid_to_tile(0, 0);
-    _agent_tile.set_type("start");
-    _agent_draw_x = _agent_tile.draw_x + _agent_tile.draw_w*0.5;
-    _agent_draw_y = _agent_tile.draw_y + _agent_tile.draw_h*0.5;
-    grid.grid_to_tile(1, 1).set_type("hole");
-    grid.grid_to_tile(3, 1).set_type("hole");
-    grid.grid_to_tile(3, 2).set_type("hole");
-    grid.grid_to_tile(0, 3).set_type("hole");
-    grid.grid_to_tile(3, 3).set_type("goal");
-
-    // learn to find your way
-    /*
-    babysitter.add(qlearning.learn, {
-      verbose : true
-    });
-    */
   }
 
   mode_qlearning.left_click = function(tile) {
@@ -88,13 +67,6 @@ var mode_qlearning = function() {
 
   mode_qlearning.right_click = function(tile) {
     // right click is not bound to anything
-  }
-
-  mode_qlearning.draw = function() {
-    ctx.fillStyle = "blue";
-    ctx.beginPath();
-    ctx.arc(_agent_draw_x, _agent_draw_y, 32, 0, 2*Math.PI);
-    ctx.fill();
   }
 
   // ------------------------------------------------------------------------------------------

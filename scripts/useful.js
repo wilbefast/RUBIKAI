@@ -26,6 +26,19 @@ var useful = function() {
     return array[Math.floor(Math.random() * (array.length - 1))];
   }
 
+  useful.max_in = function(array) {
+    var current_max_i = 0;
+    var current_max = -Infinity;
+
+    for(var i = 0; i < array.length; i++) {
+      if(array[i] > current_max) {
+        current_max = array[i];
+        current_max_i = i;
+      }
+    }
+    return current_max_i;
+  }
+
   useful.get_random_order = function(length) {
     var indices = new Array(length);
     for(var i = 0; i < length; i++) {
