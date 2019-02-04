@@ -19,7 +19,7 @@ Lesser General Public License for more details.
 "use strict"
 
 var qlearning = function() {
-  
+
   var qlearning = {
   };
   
@@ -33,6 +33,8 @@ var qlearning = function() {
     const n_states = game.get_state_count();
     const n_actions = game.get_action_count();
     const verbose = args.verbose;
+    const episodes_per_sample = args.episodes_per_sample || Math.floor(n_episodes / 40);
+    const qlog = args.qlog;
 
     // initialise the game
     game.init();
@@ -45,6 +47,7 @@ var qlearning = function() {
       for(var action = 0; action < n_actions; action++) {
         // initially our agent feel that no action in any state has any value
         Q[state][action] = 0;
+        qlog(state, action, 0);
       }
     }
 
@@ -63,12 +66,16 @@ var qlearning = function() {
       var total_reward = 0;
       var n_moves = 0;
 
-      // take a moment to contemplate life
-      if(finished_learning) {
+      // take a moment to contemplate life?
+      var show_episode = finished_learning || (verbose && !(episode % episodes_per_sample));
+      if(show_episode) {
+        if(finished_learning) {
+          console.log("learning episode", episode);
+        }
+        else {
+          console.log("learning episode", episode, "of", n_episodes);
+        }
         yield * babysitter.waitForSeconds(0.25);      
-      }
-      else if(verbose) {
-        yield * babysitter.waitForNextFrame(); 
       }
   
       // the Q-table learning algorithm
@@ -89,11 +96,8 @@ var qlearning = function() {
   
         // take the chosen action and find out what happens
         var result = game.take_action(best_action);
-        if(finished_learning) {
+        if(show_episode) {
           yield * babysitter.waitForSeconds(0.1);      
-        }
-        else if(verbose) {
-          yield * babysitter.waitForNextFrame(); 
         }
         var new_state = result.state;
         
@@ -112,6 +116,7 @@ var qlearning = function() {
         var new_q = q + learning_ratio*(reward + discount_factor*best_q - q);
         useful.assert(!isNaN(new_q));
         Q[state][best_action] = new_q;
+        qlog(state, best_action, new_q);
         
         // get ready to start again from the new state
         total_reward += result.reward;
@@ -138,11 +143,8 @@ var qlearning = function() {
       }
 
       // take a moment to contemplate life
-      if(finished_learning) {
+      if(show_episode) {
         yield * babysitter.waitForSeconds(0.25);      
-      }
-      else if(verbose) {
-        yield * babysitter.waitForNextFrame(); 
       }
     }
   }

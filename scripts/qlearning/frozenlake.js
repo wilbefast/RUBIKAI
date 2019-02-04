@@ -81,7 +81,8 @@ var frozenlake = function() {
       n_rows : 4,
       tile_class : Tile,
       tile_draw_w : 128,
-      tile_draw_h : 128
+      tile_draw_h : 128,
+      off_x : ctx.canvas.width*0.25
     });
 
     _start_tile = grid.grid_to_tile(0, 0);

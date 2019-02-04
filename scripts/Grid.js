@@ -36,10 +36,12 @@ var Grid = function() {
     _next_guid++;
     
     // rendering
+    var off_x = (args.off_x || 0);
+    var off_y = (args.off_y || 0);
     this.draw_w = this.n_cols*this.tile_draw_w;
     this.draw_h = this.n_rows*this.tile_draw_h;
-    this.draw_x = (ctx.canvas.width - this.draw_w)*0.5;
-    this.draw_y = (ctx.canvas.height - this.draw_h)*0.5;
+    this.draw_x = (ctx.canvas.width - this.draw_w)*0.5 + off_x ;
+    this.draw_y = (ctx.canvas.height - this.draw_h)*0.5 + off_y;
 
     // build tiles
     this.tiles = new Array(this.n_cols * this.n_rows);
