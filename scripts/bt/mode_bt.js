@@ -115,13 +115,16 @@ var mode_bt = function() {
       caveman_home_tile.set_type("caveman_home");
       yield * babysitter.waitForSeconds(0.5);
 
-      // create the caveman
+      // create the cavemen
+      var cavemen_to_spawn = 1;
+      var cavemen = [];
       var caveman_tile = caveman_home_tile.map_neighbours("4", function(n) {
-        return n;
+        if(cavemen_to_spawn-- > 0) {
+          cavemen.push(new Caveman({
+            tile : n
+          }));
+        }
       });
-      var caveman = new Caveman({
-        tile : caveman_tile
-      })
       yield * babysitter.waitForSeconds(0.5);
       
       // create berries
@@ -149,7 +152,15 @@ var mode_bt = function() {
 
       // keep updating until there are no berries left
       var lastFrameTime = Date.now();
-      while(!caveman.has_berry || objects.update_list.length > 1) {
+      var no_caveman_has_berry = true;
+      for(var i = 0; i < cavemen.length; i++) {
+        if(cavemen[i].has_berry) {
+          no_caveman_has_berry = false;
+          i = cavemen.length;
+        }
+      }
+
+      while(no_caveman_has_berry || objects.update_list.length > 1) {
         // calculate dt
         var thisFrameTime = Date.now();
         var deltaTime = thisFrameTime - lastFrameTime;
@@ -164,7 +175,7 @@ var mode_bt = function() {
       }
 
       // done      
-      console.log("caveman has eaten all the berries");
+      console.log("the cavemen has eaten all the berries");
       yield * mutex.release();
     });
   }

@@ -48,12 +48,15 @@ var ActionNode_GotoNearest = function() {
     if (args.path.length > 0) {
       args.timer -= dt;
       if(args.timer < 0) {
-        var new_tile = args.path.shift();
+        var new_tile = args.path[0];
         if(new_tile.contents) {
-          console.warn(new_tile.contents);
+          return BehaviourTree.FAILURE;
         }
-        args.set_tile(new_tile);
-        args.timer += 0.1;         
+        else {
+          args.path.shift();
+          args.set_tile(new_tile);
+          args.timer += 0.1;         
+        }
       }
       return BehaviourTree.RUNNING;
     }
