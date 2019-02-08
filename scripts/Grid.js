@@ -174,6 +174,15 @@ var Grid = function() {
 
     return null;
   }
+
+  Grid.prototype.any = function(f) {
+    for(var i = 0; i < this.tiles.length; i++) {
+      var tile = this.tiles[i];
+      if(f(tile)) {
+        return tile;
+      }
+    }
+  };
   
   Grid.prototype.map = function(f) {
     for(var i = 0; i < this.tiles.length; i++) {

@@ -29,16 +29,18 @@ var qlearning = function() {
     const discount_factor = args.discount_factor;
     const n_episodes = args.n_episodes;
     const game = args.game;
-    const max_moves = game.get_max_moves();
-    const n_states = game.get_state_count();
-    const n_actions = game.get_action_count();
     const verbose = args.verbose;
     const episodes_per_sample = args.episodes_per_sample || Math.floor(n_episodes / 40);
     const qlog = args.qlog;
 
     // initialise the game
-    game.init();
-  
+    game.init({
+      size : args.size
+    });
+    const max_moves = game.get_max_moves();
+    const n_states = game.get_state_count();
+    const n_actions = game.get_action_count();
+
     // create the "Q table"
     // this table contains the value of each action for each possible game-state
     var Q = new Array(n_states);

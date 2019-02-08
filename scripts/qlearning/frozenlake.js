@@ -48,16 +48,17 @@ var frozenlake = function() {
   // PRIVATE CONSTANTS
   // ------------------------------------------------------------------------------------------
 
-  const _grid_w = 4;
-  const _grid_h = 4;
-  const _n_states = _grid_w*_grid_h;
   const _n_actions = 4;
   const _max_moves = 99;
-
+  
   // ------------------------------------------------------------------------------------------
   // PRIVATE VARIABLES
   // ------------------------------------------------------------------------------------------
-
+  
+  var _grid_w;
+  var _grid_h;
+  var _n_states;
+  var _n_holes;
   var _start_tile;
   var _agent;
   var _randomiser = [-1, 0, 1];
@@ -70,27 +71,58 @@ var frozenlake = function() {
     return _agent.tile.col + _grid_w*_agent.tile.row;
   }
 
+  var _no_escape = function(tile) {
+    return !tile.any_neighbours("4", function(n) {
+      return n && (n.is_type("free") || n.is_type("goal"));
+    });
+  }
+
+  var _any_no_escape = function() {
+    return grid.any(function(t) {
+      return _no_escape(t)
+    })
+  }
+
   // ------------------------------------------------------------------------------------------
   // PUBLIC FUNCTION
   // ------------------------------------------------------------------------------------------
   
-  frozenlake.init = function() {
+  frozenlake.init = function(args) {
+    // unpack args
+    _grid_w = _grid_h = args.size;
+    _n_states = _grid_w*_grid_h;
+    var _n_holes = Math.floor(Math.sqrt(_n_states));
+
     // create a small grid
     grid = new Grid({
-      n_cols : 4,
-      n_rows : 4,
+      n_cols : _grid_w,
+      n_rows : _grid_h,
       tile_class : Tile,
-      tile_draw_w : 128,
-      tile_draw_h : 128,
+      tile_draw_w : 512 / _grid_w,
+      tile_draw_h : 512 / _grid_h,
       off_x : ctx.canvas.width*0.25
     });
 
     _start_tile = grid.grid_to_tile(0, 0);
-    grid.grid_to_tile(1, 1).set_type("hole");
-    grid.grid_to_tile(3, 1).set_type("hole");
-    grid.grid_to_tile(3, 2).set_type("hole");
-    grid.grid_to_tile(0, 3).set_type("hole");
-    grid.grid_to_tile(3, 3).set_type("goal");
+
+    var t;
+    for(var i = 0; i < _n_holes; i++) {
+      t = null;
+      var attempts = 0;
+      do {
+        if(t) {
+          // undo the last attempt, which was invalid apparently
+          t.set_type("free");
+        }
+        t = grid.get_random_tile(function(t) {
+          return t.is_type("free") && (t.col || t.row);
+        });
+        t.set_type("hole");
+      }
+      while(attempts++ < 100 && _any_no_escape());
+    }
+
+    grid.grid_to_tile(_grid_w - 1, _grid_h - 1).set_type("goal");
 
     _agent = new Agent({
       tile : _start_tile

@@ -52,21 +52,22 @@ var mode_qlearning = function() {
     }
 
     // set random seed, for easier debugging
-    Math.seedrandom('They would be able to converse with each other to sharpen their wits.');
+    //Math.seedrandom('They would be able to converse with each other to sharpen their wits.');
 
     // create grid for rendering the agent's "brain"
+    var size = 8;
     _q_debug_grid = new Grid({
-      n_cols : 4,
-      n_rows : 4,
+      n_cols : size,
+      n_rows : size,
       tile_class : QTile,
-      tile_draw_w : 128,
-      tile_draw_h : 128,
+      tile_draw_w : 512 / size,
+      tile_draw_h : 512 / size,
       off_x : -ctx.canvas.width*0.25
     });
 
     var _qlog = function(state, action, value) {
-      var row = Math.floor(state / _q_debug_grid.n_cols);
-      var col = state % _q_debug_grid.n_cols;
+      var row = Math.floor(state / size);
+      var col = state % size;
       var tile = _q_debug_grid.grid_to_tile(col, row);
       tile.set_action_value(action, value);
     }
@@ -74,12 +75,13 @@ var mode_qlearning = function() {
     // learn to walk
     babysitter.add(qlearning.play, {
       game : frozenlake,
+      size : size,
       verbose : true,
-      episodes_per_sample : 50,
+      episodes_per_sample : 500,
       qlog : _qlog,
       learning_ratio : 0.8,
       discount_factor : 0.95,
-      n_episodes : 2000
+      n_episodes : 4000
     });
   }
 
