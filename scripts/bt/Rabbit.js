@@ -26,8 +26,16 @@ var Rabbit = function() {
   // ------------------------------------------------------------------------------------------
 
   var Rabbit = function(args) {
-
+    // super constructor
     TileObject.call(this, args);
+
+    // clear nearby berries
+    this.tile.map_neighbours("8", function(t) {
+      // clear berries from around the rabbit
+      if(t.contents && t.contents.is_berry) {
+        t.contents.purge = true;
+      }
+    });
 
     // done
     return this;
