@@ -36,7 +36,14 @@
   <script type="text/javascript" src="scripts/qlearning/frozenlake.js" defer="true"></script>  
   <script type="text/javascript" src="scripts/qlearning/qlearning.js" defer="true"></script>
   <script type="text/javascript" src="scripts/qlearning/mode_qlearning.js" defer="true"></script>
+  <!-- Genetic algorithm -->  
+  <script type="text/javascript" src="scripts/genetic/WeightTile.js" defer="true"></script>    
+  <script type="text/javascript" src="scripts/genetic/zombierun.js" defer="true"></script>  
+  <script type="text/javascript" src="scripts/genetic/genetic.js" defer="true"></script>
+  <script type="text/javascript" src="scripts/genetic/mode_genetic.js" defer="true"></script>
+  <!-- Main -->  
   <script type="text/javascript" src="scripts/main.js" defer="true"></script>
+  
   <script type="text/javascript">
     window.onload = function() {
       main();
@@ -55,6 +62,7 @@
       <button onclick="babysitter.clear(); mode = mode_minimax; mode.init();">Minimax demo</button>
       <button onclick="babysitter.clear(); mode = mode_bt; mode.init();">Behaviour Tree demo</button>
       <button onclick="babysitter.clear(); mode = mode_qlearning; mode.init();">Q-learning demo</button>
+      <button onclick="babysitter.clear(); mode = mode_genetic; mode.init();">Genetic algorithm demo</button>
     </div>
 
     <div style="display:none">

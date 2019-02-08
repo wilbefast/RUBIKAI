@@ -15,91 +15,61 @@ Lesser General Public License for more details.
 "use strict";
 
 // ----------------------------------------------------------------------------
-// QLEARNING FOR "FROZEN LAKE" ENVIRONMENT
+// GENETIC ALGORITHM FOR "ZOMBIE RUN" GAME
 // ----------------------------------------------------------------------------
 
-var mode_qlearning = function() {
+var mode_genetic = function() {
 
-  var mode_qlearning = {
+  var mode_genetic = {
   }
 
-  var _q_debug_grid;
-
-  mode_qlearning.init = function() {
+  mode_genetic.init = function() {
 
     // clean up
     mutex.force_release();    
     objects.clear();
 
-    // set tile types
-    Tile.prototype.tile_types = {
-      free : {
-        name : "free",
-        colour : "white"      
-      },
-      hole : {
-        name : "hole",
-        colour : "cyan"
-      },
-      start : {
-        name : "start",
-        colour : "yellow"
-      },
-      goal : {
-        name : "goal",
-        colour : "lime"
-      }
-    }
-
     // set random seed, for easier debugging
-    //Math.seedrandom('They would be able to converse with each other to sharpen their wits.');
+    Math.seedrandom('So if the infection wipes us all out- that is a return to normality.');
 
     // create grid for rendering the agent's "brain"
-    var size = 8;
-    _q_debug_grid = new Grid({
+    const size = 5;
+    grid = new Grid({
       n_cols : size,
       n_rows : size,
-      tile_class : QTile,
+      tile_class : WeightTile,
       tile_draw_w : 512 / size,
       tile_draw_h : 512 / size,
       off_x : -ctx.canvas.width*0.25
     });
 
-    var _qlog = function(state, action, value) {
-      var row = Math.floor(state / size);
-      var col = state % size;
-      var tile = _q_debug_grid.grid_to_tile(col, row);
-      tile.set_action_value(action, value);
-    }
-
-    // learn to walk
-    babysitter.add(qlearning.play, {
-      game : frozenlake,
+    // learn to run
+    zombierun.init({
+      off_x : ctx.canvas.width*0.25,
+      draw_w : grid.draw_w,
+      draw_h : grid.draw_h
+    });
+    babysitter.add(genetic.play, {
+      game : zombierun,
       size : size,
-      verbose : true,
-      episodes_per_sample : 500,
-      qlog : _qlog,
-      learning_ratio : 0.8,
-      discount_factor : 0.95,
-      n_episodes : 4000
     });
   }
 
-  mode_qlearning.left_click = function(tile) {
+  mode_genetic.left_click = function(tile) {
     // left click is not bound to anything
   }
 
-  mode_qlearning.right_click = function(tile) {
+  mode_genetic.right_click = function(tile) {
     // right click is not bound to anything
   }
 
-  mode_qlearning.draw = function() {
-    _q_debug_grid.draw();
+  mode_genetic.draw = function() {
+    zombierun.draw();
   }
 
   // ------------------------------------------------------------------------------------------
   // EXPORT
   // ------------------------------------------------------------------------------------------
 
-  return mode_qlearning;
+  return mode_genetic;
 }();
