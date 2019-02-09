@@ -29,7 +29,8 @@ var genetic = function() {
     const verbose = args.verbose;
 
     while(true) {
-      game.control(Math.random()*2 - 1, Math.random()*2 - 1)
+      //game.control(Math.random()*2 - 1, Math.random()*2 - 1)
+      game.control(keyboard.x, keyboard.y);
       game.update();
       yield * babysitter.waitForNextFrame();      
     }

@@ -40,9 +40,10 @@ var zombierun = function() {
   var human_y = 0.5;
   var human_dx = 0;
   var human_dy = 0;
-  var human_acceleration = 0.01;
-  var human_maxspeed = 0.3;
-  var human_friction = 1.01;
+  var human_acceleration = 0.0008;
+  var human_maxspeed = 0.08;
+  var human_friction = 1.05;
+  var human_bounce = 0.9;
 
   var human_ctrl_x = 0;
   var human_ctrl_y = 0;
@@ -51,9 +52,11 @@ var zombierun = function() {
   var zombie_y = 0;
   var zombie_dx = 0;
   var zombie_dy = 0;
-  var zombie_acceleration = 0.01;
-  var zombie_maxspeed = 0.3;
-  var zombie_friction = 1.01;  
+  var zombie_acceleration = 0.001;
+  var zombie_maxspeed = 0.1;
+  var zombie_friction = 1.02;  
+  var zombie_grab_distance = 0.03;
+  var zombie_bounce = 0.07;
  
   // ------------------------------------------------------------------------------------------
   // PRIVATE FUNCTIONS
@@ -91,8 +94,15 @@ var zombierun = function() {
   }
 
   zombierun.control = function(x, y) {
-    human_ctrl_x = x;
-    human_ctrl_y = y;
+    var control_vector = vector.normalise(x, y);
+    var l = control_vector.originalLength; 
+    if(l > 0) {
+      human_ctrl_x = x / l;
+      human_ctrl_y = y / l;
+    }
+    else {
+      human_ctrl_x = human_ctrl_y = 0;
+    }
   }
 
   zombierun.update = function() {
@@ -101,19 +111,19 @@ var zombierun = function() {
     human_y += human_dy;
     if(human_x > 1) {
       human_x = 1;
-      human_dx *= -0.5;
+      human_dx *= -human_bounce;
     }
     if(human_y > 1) {
       human_y = 1;
-      human_dy *= -0.5;
+      human_dy *= -human_bounce;
     }
     if(human_x < 0) {
       human_x = 0;
-      human_dx *= -0.5;
+      human_dx *= -human_bounce;
     }
     if(human_y < 0) {
       human_y = 0;
-      human_dy *= -0.5;
+      human_dy *= -human_bounce;
     }
     human_dx /= human_friction;
     human_dy /= human_friction;
@@ -125,27 +135,27 @@ var zombierun = function() {
     }
 
     // make human move based on input
-    human_x += human_ctrl_x*human_acceleration;
-    human_y += human_ctrl_y*human_acceleration;
+    human_dx += human_ctrl_x*human_acceleration;
+    human_dy += human_ctrl_y*human_acceleration;
 
     // update zombie physics
     zombie_x += zombie_dx;
     zombie_y += zombie_dy;
     if(zombie_x > 1) {
       zombie_x = 1;
-      zombie_dx *= -0.5;
+      zombie_dx *= -zombie_bounce;
     }
     if(zombie_y > 1) {
       zombie_y = 1;
-      zombie_dy *= -0.5;
+      zombie_dy *= -zombie_bounce;
     }
     if(zombie_x < 0) {
       zombie_x = 0;
-      zombie_dx *= -0.5;
+      zombie_dx *= -zombie_bounce;
     }
     if(zombie_y < 0) {
       zombie_y = 0;
-      zombie_dy *= -0.5;
+      zombie_dy *= -zombie_bounce;
     }
     zombie_dx /= zombie_friction;
     zombie_dy /= zombie_friction;
@@ -158,13 +168,14 @@ var zombierun = function() {
 
     // make zombie chase human
     var chase = vector.normalise(human_x - zombie_x, human_y - zombie_y);
-    if(chase.originalLength < zombie_acceleration) {
+    if(chase.originalLength < zombie_grab_distance) {
       // nom nom nom nom nom
       zombierun.reset();
     }
     else {
-      zombie_x += chase.x*zombie_acceleration;
-      zombie_y += chase.y*zombie_acceleration;
+      var a = Math.random() * zombie_acceleration;
+      zombie_dx += chase.x*a;
+      zombie_dy += chase.y*a;
     }
   }
 

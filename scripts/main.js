@@ -21,7 +21,7 @@ Lesser General Public License for more details.
 // global variables: we'd want to do this more cleanly if this were a 'real' project
 var ctx;
 var grid;
-var mode;
+var mode; 
 
 var main = function() {
 
@@ -64,6 +64,28 @@ var main = function() {
     cursor.right_click();
     event.preventDefault();
   }, false);
+
+  window.addEventListener('keydown', function(event) {
+    var up, down, left, right;
+    switch(event.keyCode || event.which) {
+      case 38: keyboard.up(true); break;
+      case 40: keyboard.down(true); break;
+      case 37: keyboard.left(true); break;
+      case 39: keyboard.right(true); break;
+      default: break;      
+    }
+  });
+
+  window.addEventListener('keyup', function(event) {
+    var up, down, left, right;
+    switch(event.keyCode || event.which) {
+      case 38: keyboard.up(false); break;
+      case 40: keyboard.down(false); break;
+      case 37: keyboard.left(false); break;
+      case 39: keyboard.right(false); break;
+      default: break;
+    }
+  });
 
   // ----------------------------------------------------------------------------
   // START REQUESTING ANIMATION FRAME
