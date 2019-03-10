@@ -62,6 +62,8 @@ var BehaviourTree = function() {
 
   BehaviourTree.prototype.build_chart = function() {
 
+    useful.assert(!this.chart, "Only 1 chart can exist at a time");
+
     var nodes = [];
     var edges = [];
 
@@ -81,7 +83,7 @@ var BehaviourTree = function() {
       }
     });
 
-    var cy = window.cy = cytoscape({
+    this.chart = cytoscape({
       container: document.getElementById('cytoscape'),
     
       boxSelectionEnabled: false,
@@ -92,23 +94,8 @@ var BehaviourTree = function() {
           selector: 'node',
           style: {
             'content': 'data(id)',
-            'text-opacity': 0.5,
-            'text-valign': 'center',
-            'text-halign': 'right',
-            'background-color': '#11479e'
           }
         },
-    
-        {
-          selector: 'edge',
-          style: {
-            'curve-style': 'bezier',
-            'width': 4,
-            'target-arrow-shape': 'triangle',
-            'line-color': '#9dbaea',
-            'target-arrow-color': '#9dbaea'
-          }
-        }
       ],
 
       layout: {
@@ -121,7 +108,11 @@ var BehaviourTree = function() {
         nodes: nodes,
         edges: edges
       },
-    });    
+    }); 
+    
+    this.chart.$("#eat_food").style({
+      "background-color": "red"
+    });
   }
 
   // ------------------------------------------------------------------------------------------
