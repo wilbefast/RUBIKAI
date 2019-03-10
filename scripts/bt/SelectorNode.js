@@ -31,6 +31,7 @@ var SelectorNode = function() {
     return this;
   }
   SelectorNode.prototype.add_child = BehaviourNode.prototype.add_child;
+  SelectorNode.prototype.map = BehaviourNode.prototype.map;
 
 
   // ------------------------------------------------------------------------------------------

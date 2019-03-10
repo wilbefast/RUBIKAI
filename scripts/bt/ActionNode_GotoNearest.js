@@ -34,6 +34,8 @@ var ActionNode_GotoNearest = function() {
     return this;
   }
 
+  ActionNode_GotoNearest.prototype.map = BehaviourNode.prototype.map;  
+
   // ------------------------------------------------------------------------------------------
   // UPDATE
   // ------------------------------------------------------------------------------------------

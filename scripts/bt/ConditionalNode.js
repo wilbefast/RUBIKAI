@@ -39,9 +39,11 @@ var ConditionalNode = function() {
   // ------------------------------------------------------------------------------------------
 
   ConditionalNode.prototype.add_child = function(child) {
-    useful.assert(!this.child, "Conditional nodes can only have 1 child");
-    this.child = child;
+    useful.assert(this.children.length == 0, "Conditional nodes can only have 1 child");
+    this.children[0] = child;
   }
+
+  ConditionalNode.prototype.map = BehaviourNode.prototype.map;  
 
   // ------------------------------------------------------------------------------------------
   // UPDATE
@@ -49,7 +51,7 @@ var ConditionalNode = function() {
 
   ConditionalNode.prototype.update = function(dt, args) {
     if(this.predicate()) {
-      var result = this.child.update(dt, args);
+      var result = this.children[0].update(dt, args);
       useful.assert(result, "Behaviour tree nodes must return a result");
       return result;
     }

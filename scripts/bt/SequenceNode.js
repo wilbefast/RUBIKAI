@@ -31,6 +31,8 @@ var SequenceNode = function() {
     return this;
   }
   SequenceNode.prototype.add_child = BehaviourNode.prototype.add_child;
+  SequenceNode.prototype.map = BehaviourNode.prototype.map;
+  
   
   // ------------------------------------------------------------------------------------------
   // UPDATE

@@ -99,7 +99,7 @@ var mode_bt = function() {
 
     // create a maze
     babysitter.add(astar.generate_maze, {
-      verbose : true
+      verbose : false
     });
 
     // set up AI caveman
@@ -115,7 +115,7 @@ var mode_bt = function() {
       });
       useful.assert(caveman_home_tile, "there must be a tile for the player to spawn on");
       caveman_home_tile.set_type("caveman_home");
-      yield * babysitter.waitForSeconds(0.5);
+      //yield * babysitter.waitForSeconds(0.5);
 
       // create the cavemen
       var cavemen_to_spawn = 1;
@@ -127,7 +127,7 @@ var mode_bt = function() {
           }));
         }
       });
-      yield * babysitter.waitForSeconds(0.5);
+      //yield * babysitter.waitForSeconds(0.5);
       
       // create berries
       for(var i = 0; i < 0.1*grid.tiles.length; i++) {
@@ -140,17 +140,17 @@ var mode_bt = function() {
         });
 
         if(i % 100 === 0) {
-          yield * babysitter.waitForNextFrame();             
+          //yield * babysitter.waitForNextFrame();             
         }
       }
 
       // create the bear
       //_make_bear();
-      yield * babysitter.waitForSeconds(0.25);       
+      //yield * babysitter.waitForSeconds(0.25);       
       
       // create the rabbit
       //_make_rabbit();
-      yield * babysitter.waitForSeconds(0.25);     
+      //yield * babysitter.waitForSeconds(0.25);     
 
       // keep updating until there are no berries left
       var lastFrameTime = Date.now();

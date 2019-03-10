@@ -56,6 +56,14 @@ var BehaviourNode = function() {
   BehaviourNode.prototype.add_child = function(child) {
     this.children.push(child);
   }
+
+  BehaviourNode.prototype.map = function(f) {
+    f(this);
+    for(var i = 0; i < this.children.length; i++) {
+      var child = this.children[i];
+      child.map(f);
+    }
+  }
   
   // ------------------------------------------------------------------------------------------
   // EXPORT
