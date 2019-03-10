@@ -60,9 +60,17 @@ var Caveman = function() {
                   return this.state = BehaviourTree.FAILURE;                    
                 }
                 else {
-                  caveman.has_berry = false;
-                  console.log("ate berry");
-                  return this.state = BehaviourTree.SUCCESS;
+                  caveman.progress = (caveman.progress || 0) + 3*dt;
+                  if(caveman.progress > 1) {
+                    caveman.has_berry = false;
+                    delete caveman.progress;
+                    console.log("ate berry");
+                    return this.state = BehaviourTree.SUCCESS;
+                  }
+                  else {
+                    console.log("caveman eating berry", Math.floor(caveman.progress*100) + "%");
+                    return this.state = BehaviourTree.RUNNING;                    
+                  }
                 }
               }
             });
@@ -79,19 +87,28 @@ var Caveman = function() {
             name : "harvest_berry",
             parent : berry_check,
             update : function(dt) {
-              console.log("harvesting berry")
-              caveman.tile.map_neighbours("4", function(n) {
-                if(n.contents && n.contents.is_berry) {
-                  n.contents.purge = true;
-                  caveman.has_berry = true;
-                }
-              });
+              caveman.progress = (caveman.progress || 0) + 3*dt;
+              if(caveman.progress > 1) {
+                caveman.tile.map_neighbours("4", function(n) {
+                  if(n.contents && n.contents.is_berry) {
+                    n.contents.purge = true;
+                    caveman.has_berry = true;
+                  }
+                });
+              }
+              else {
+                console.log("harvesting berry", Math.floor(caveman.progress*100) + "%");
+                return this.state = BehaviourTree.RUNNING;                    
+              }
+
               if(caveman.has_berry) {
                 console.log("harvested berry");
                 caveman.path = null;
+                delete caveman.progress;
                 return this.state = BehaviourTree.SUCCESS;
               }
               else {
+                console.log("failed to harvest berry");                
                 return this.state = BehaviourTree.FAILURE;
               }
             }
