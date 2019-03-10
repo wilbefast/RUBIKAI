@@ -32,6 +32,7 @@ var SequenceNode = function() {
   }
   SequenceNode.prototype.add_child = BehaviourNode.prototype.add_child;
   SequenceNode.prototype.map = BehaviourNode.prototype.map;
+  SequenceNode.prototype.map_children = BehaviourNode.prototype.map_children;    
   
   
   // ------------------------------------------------------------------------------------------
@@ -39,6 +40,8 @@ var SequenceNode = function() {
   // ------------------------------------------------------------------------------------------
     
   SequenceNode.prototype.update = function(dt, args) {
+    this.state = BehaviourTree.RUNNING;
+
     for(var i = 0; i < this.children.length; i++) {
       var result = this.children[i].update(dt, args);
       useful.assert(result, "Behaviour tree nodes must return a result");      

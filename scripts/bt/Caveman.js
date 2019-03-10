@@ -39,39 +39,48 @@ var Caveman = function() {
             return caveman.has_berry;
           }
         });
-          var eat_sequence = new SequenceNode({
-            name : "eat_sequence",
+          var eat_selector = new SelectorNode({
+            name : "eat_selector",
             parent : carry_check
           });
-            var go_home = new ActionNode_GotoNearest({
-              name : "go_home",
-              parent : eat_sequence,
-              such_that : function(tile) {
-                return tile.any_neighbours("4", function(n) {
+            var home_check = new ConditionalNode({
+              name : "home_check",
+              parent : eat_selector,
+              predicate : function() { 
+                return caveman.tile.any_neighbours("4", function(n) {
                   return n.is_type("caveman_home");
                 });
               }
             });
-            var eat_food = new BehaviourNode({
-              name : "eat_food",
-              parent : eat_sequence,
-              update : function(dt) {
-                if(!caveman.has_berry) {
-                  return this.state = BehaviourTree.FAILURE;                    
-                }
-                else {
-                  caveman.progress = (caveman.progress || 0) + 3*dt;
-                  if(caveman.progress > 1) {
-                    caveman.has_berry = false;
-                    delete caveman.progress;
-                    console.log("ate berry");
-                    return this.state = BehaviourTree.SUCCESS;
+              var eat_food = new BehaviourNode({
+                name : "eat_food",
+                parent : home_check,
+                update : function(dt) {
+                  if(!caveman.has_berry) {
+                    return this.state = BehaviourTree.FAILURE;                    
                   }
                   else {
-                    console.log("caveman eating berry", Math.floor(caveman.progress*100) + "%");
-                    return this.state = BehaviourTree.RUNNING;                    
+                    caveman.progress = (caveman.progress || 0) + 3*dt;
+                    if(caveman.progress > 1) {
+                      caveman.has_berry = false;
+                      delete caveman.progress;
+                      console.log("ate berry");
+                      return this.state = BehaviourTree.SUCCESS;
+                    }
+                    else {
+                      console.log("caveman eating berry", Math.floor(caveman.progress*100) + "%");
+                      return this.state = BehaviourTree.RUNNING;                    
+                    }
                   }
                 }
+              });
+            var go_home = new ActionNode_GotoNearest({
+              name : "go_home",
+              parent : eat_selector,
+              such_that : function(tile) {
+                return tile.any_neighbours("4", function(n) {
+                  return n.is_type("caveman_home");
+                });
               }
             });
         var berry_check = new ConditionalNode({

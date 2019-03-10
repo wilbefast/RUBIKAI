@@ -83,7 +83,6 @@ var BehaviourTree = function() {
     var edges = [];
 
     this.map(function(bt_node) {
-      console.log(bt_node.name)
       nodes.push({
         data : {
           id: bt_node.name

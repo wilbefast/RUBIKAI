@@ -44,6 +44,7 @@ var ConditionalNode = function() {
   }
 
   ConditionalNode.prototype.map = BehaviourNode.prototype.map;  
+  ConditionalNode.prototype.map_children = BehaviourNode.prototype.map_children;  
 
   // ------------------------------------------------------------------------------------------
   // UPDATE
@@ -53,9 +54,12 @@ var ConditionalNode = function() {
     if(this.predicate()) {
       var result = this.children[0].update(dt, args);
       useful.assert(result, "Behaviour tree nodes must return a result");
-      return result;
+      return this.state = result;
     }
     else {
+      this.map_children(function(bt_node) {
+        bt_node.state = BehaviourTree.PENDING;
+      });
       return this.state = BehaviourTree.FAILURE;
     }
   }

@@ -32,6 +32,7 @@ var SelectorNode = function() {
   }
   SelectorNode.prototype.add_child = BehaviourNode.prototype.add_child;
   SelectorNode.prototype.map = BehaviourNode.prototype.map;
+  SelectorNode.prototype.map_children = BehaviourNode.prototype.map_children;    
 
 
   // ------------------------------------------------------------------------------------------
@@ -47,6 +48,11 @@ var SelectorNode = function() {
         return this.state = BehaviourTree.SUCCESS;
       }
       else if (result === BehaviourTree.RUNNING) {
+        while(++i < this.children.length) {
+          this.children[i].map(function(bt_node) {
+            bt_node.state = BehaviourTree.PENDING;
+          })
+        }
         return this.state = BehaviourTree.RUNNING;
       }
     }
