@@ -45,6 +45,9 @@ var BehaviourNode = function() {
     this.hash = _next_guid;
     _next_guid++;
 
+    // initially state
+    this.state = BehaviourTree.PENDING;
+
     // done
     return this;
   }

@@ -44,16 +44,16 @@ var SequenceNode = function() {
       useful.assert(result, "Behaviour tree nodes must return a result");      
       if(result === BehaviourTree.FAILURE) {
         // any failure is a failure of the sequence
-        return BehaviourTree.FAILURE;
+        return this.state = BehaviourTree.FAILURE;
       }
       else if (result === BehaviourTree.RUNNING) {
-        return BehaviourTree.RUNNING;
+        return this.state = BehaviourTree.RUNNING;
       }
     }
 
     // made it to the end
     console.log(this.name, "sequence finished")
-    return BehaviourTree.SUCCESS;
+    return this.state = BehaviourTree.SUCCESS;
   };
   
   // ------------------------------------------------------------------------------------------

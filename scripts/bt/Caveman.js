@@ -57,12 +57,12 @@ var Caveman = function() {
               parent : eat_sequence,
               update : function(dt) {
                 if(!caveman.has_berry) {
-                  return BehaviourTree.FAILURE;                    
+                  return this.state = BehaviourTree.FAILURE;                    
                 }
                 else {
                   caveman.has_berry = false;
                   console.log("ate berry");
-                  return BehaviourTree.SUCCESS;
+                  return this.state = BehaviourTree.SUCCESS;
                 }
               }
             });
@@ -89,10 +89,10 @@ var Caveman = function() {
               if(caveman.has_berry) {
                 console.log("harvested berry");
                 caveman.path = null;
-                return BehaviourTree.SUCCESS;
+                return this.state = BehaviourTree.SUCCESS;
               }
               else {
-                return BehaviourTree.FAILURE;
+                return this.state = BehaviourTree.FAILURE;
               }
             }
           });

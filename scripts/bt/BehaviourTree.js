@@ -41,7 +41,22 @@ var BehaviourTree = function() {
   BehaviourTree.SUCCESS = 1;
   BehaviourTree.FAILURE = 2;
   BehaviourTree.RUNNING = 3;
+  BehaviourTree.PENDING = 4;
   
+  BehaviourTree.styles = [];
+  BehaviourTree.styles[BehaviourTree.SUCCESS] = {
+    "background-color": "blue"
+
+  };
+  BehaviourTree.styles[BehaviourTree.FAILURE] = {
+    "background-color": "red"
+  };
+  BehaviourTree.styles[BehaviourTree.RUNNING] = {
+    "background-color": "yellow"
+  };
+  BehaviourTree.styles[BehaviourTree.PENDING] = {
+    "background-color": "grey"
+  };
 
   // ------------------------------------------------------------------------------------------
   // CHILDREN
@@ -68,13 +83,14 @@ var BehaviourTree = function() {
     var edges = [];
 
     this.map(function(bt_node) {
-      nodes.unshift({
+      console.log(bt_node.name)
+      nodes.push({
         data : {
           id: bt_node.name
         }
       });
       if(bt_node.parent && bt_node.parent.name) {
-        edges.unshift({
+        edges.push({
           data : {
             source : bt_node.parent.name,
             target : bt_node.name
@@ -83,7 +99,7 @@ var BehaviourTree = function() {
       }
     });
 
-    this.chart = cytoscape({
+    var chart = cytoscape({
       container: document.getElementById('cytoscape'),
     
       boxSelectionEnabled: false,
@@ -99,10 +115,8 @@ var BehaviourTree = function() {
       ],
 
       layout: {
-        name: 'breadthfirst',
-        directed: true,
-        padding: 10
-      },
+        name: 'dagre'
+      },    
     
       elements: {
         nodes: nodes,
@@ -110,9 +124,11 @@ var BehaviourTree = function() {
       },
     }); 
     
-    this.chart.$("#eat_food").style({
-      "background-color": "red"
+    this.map(function(bt_node) {
+      bt_node.chart_node = chart.$("#" + bt_node.name + "");
     });
+
+    this.chart = chart;
   }
 
   // ------------------------------------------------------------------------------------------
@@ -120,11 +136,18 @@ var BehaviourTree = function() {
   // ------------------------------------------------------------------------------------------
     
   BehaviourTree.prototype.update = function(dt, args) {
+    // update the model
     useful.assert(this.root, "there must be a root node");
     var result = this.root.update(dt, args);  
     useful.assert(result, "Behaviour tree nodes must return a result");
     useful.assert(result === BehaviourTree.SUCCESS || result === BehaviourTree.FAILURE || result === BehaviourTree.RUNNING,
       "The behaviour tree update result can only ever be SUCCESS, FAILURE or RUNNING");    
+  
+
+    // refresh the view
+    this.map(function(bt_node) {
+      bt_node.chart_node.style(BehaviourTree.styles[bt_node.state]);
+    });
   };
   
   // ------------------------------------------------------------------------------------------

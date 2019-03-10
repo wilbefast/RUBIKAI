@@ -56,7 +56,7 @@ var ConditionalNode = function() {
       return result;
     }
     else {
-      return BehaviourTree.FAILURE;
+      return this.state = BehaviourTree.FAILURE;
     }
   }
   

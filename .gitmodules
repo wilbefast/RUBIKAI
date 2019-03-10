@@ -4,3 +4,9 @@
 [submodule "scripts/cytoscape"]
 	path = scripts/cytoscape
 	url = https://github.com/cytoscape/cytoscape.js
+[submodule "scripts/dagre"]
+	path = scripts/dagre
+	url = https://github.com/dagrejs/dagre
+[submodule "scripts/cytoscape-dagre"]
+	path = scripts/cytoscape-dagre
+	url = https://github.com/cytoscape/cytoscape.js-dagre

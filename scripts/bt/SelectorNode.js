@@ -44,15 +44,15 @@ var SelectorNode = function() {
       useful.assert(result, "Behaviour tree nodes must return a result");      
       if(result === BehaviourTree.SUCCESS) {
         // any success is a success of the selector
-        return BehaviourTree.SUCCESS;
+        return this.state = BehaviourTree.SUCCESS;
       }
       else if (result === BehaviourTree.RUNNING) {
-        return BehaviourTree.RUNNING;
+        return this.state = BehaviourTree.RUNNING;
       }
     }
 
     // nothing has worked
-    return BehaviourTree.FAILURE;
+    return this.state = BehaviourTree.FAILURE;
   };
   
   // ------------------------------------------------------------------------------------------
