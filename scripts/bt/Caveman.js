@@ -106,6 +106,8 @@ var Caveman = function() {
           }
         });
 
+    behaviour_tree.build_chart();
+        
     return behaviour_tree;
   }
 

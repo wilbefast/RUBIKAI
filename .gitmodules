@@ -1,3 +1,6 @@
 [submodule "scripts/seedrandom"]
 	path = scripts/seedrandom
 	url = https://github.com/davidbau/seedrandom
+[submodule "scripts/cytoscape"]
+	path = scripts/cytoscape
+	url = https://github.com/cytoscape/cytoscape.js

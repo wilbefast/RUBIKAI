@@ -32,7 +32,7 @@ var mode_genetic = function() {
     // set random seed, for easier debugging
     Math.seedrandom('So if the infection wipes us all out- that is a return to normality.');
 
-    // create grid for rendering the agent's "brain"
+    // TODO: the grid is not currently used
     const size = 5;
     grid = new Grid({
       n_cols : size,

@@ -87,12 +87,14 @@ var mode_bt = function() {
     Math.seedrandom('Two household, both alike in dignity.');
 
     // create a nice big grid
+    const size = 40;
     grid = new Grid({
-      n_cols : 80,
-      n_rows : 40,
+      n_cols : size,
+      n_rows : size,
       tile_class : Tile,
-      tile_draw_w : 16,
-      tile_draw_h : 16
+      tile_draw_w : 512 / size,
+      tile_draw_h : 512 / size,
+      off_x : ctx.canvas.width*0.25
     });
 
     // create a maze

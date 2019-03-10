@@ -1,8 +1,9 @@
 <html>
 
 <head>
-  <!-- Utilities -->    
+  <!-- Utilities -->  
   <script type="text/javascript" src="scripts/seedrandom/seedrandom.min.js" defer="true"></script>  
+  <script type="text/javascript" src="scripts/cytoscape/dist/cytoscape.min.js" defer="true"></script>     
   <script type="text/javascript" src="scripts/useful.js" defer="true"></script>
   <script type="text/javascript" src="scripts/vector.js" defer="true"></script>
   <script type="text/javascript" src="scripts/babysitter.js" defer="true"></script>
@@ -53,9 +54,10 @@
 </head>
 
 <body style="margin:0;padding:0">
-    <div style="position:relative">
-        <canvas id="destination_canvas" style="background-color: pink">
-        </canvas>  
+  <div style="position:relative">
+      <div id="cy" style="width: 50%; height: 70%; position: absolute; left: 0; top: 15%; background: white;"></div>
+      <canvas id="destination_canvas" style="background-color: pink">
+      </canvas>  
     </div>
 
     <div style="position: absolute; top: 8px; left: 8px; user-select: none;">
@@ -65,10 +67,9 @@
       <button onclick="babysitter.clear(); mode = mode_qlearning; mode.init();">Q-learning demo</button>
       <button onclick="babysitter.clear(); mode = mode_genetic; mode.init();">Genetic algorithm demo</button>
     </div>
-
     <div style="display:none">
-        <canvas id="source_canvas" width="1280" height="720">    
-        </canvas>
+      <canvas id="source_canvas" width="1280" height="720">    
+      </canvas>
     </div>
 </body>
 </html>
