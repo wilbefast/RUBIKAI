@@ -34,7 +34,14 @@ var SequenceNode = function() {
   SequenceNode.prototype.map = BehaviourNode.prototype.map;
   SequenceNode.prototype.map_children = BehaviourNode.prototype.map_children;    
   
-  
+  // ------------------------------------------------------------------------------------------
+  // RENDERING
+  // ------------------------------------------------------------------------------------------
+
+  SequenceNode.prototype.style = {
+    shape : "tag"
+  };
+
   // ------------------------------------------------------------------------------------------
   // UPDATE
   // ------------------------------------------------------------------------------------------

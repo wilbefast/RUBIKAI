@@ -34,6 +34,13 @@ var SelectorNode = function() {
   SelectorNode.prototype.map = BehaviourNode.prototype.map;
   SelectorNode.prototype.map_children = BehaviourNode.prototype.map_children;    
 
+  // ------------------------------------------------------------------------------------------
+  // RENDERING
+  // ------------------------------------------------------------------------------------------
+
+  SelectorNode.prototype.style = {
+    shape : "star"
+  };
 
   // ------------------------------------------------------------------------------------------
   // UPDATE

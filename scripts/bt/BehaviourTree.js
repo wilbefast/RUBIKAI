@@ -45,17 +45,17 @@ var BehaviourTree = function() {
   
   BehaviourTree.styles = [];
   BehaviourTree.styles[BehaviourTree.SUCCESS] = {
-    "background-color": "blue"
+    "background-color": "yellow"
 
   };
   BehaviourTree.styles[BehaviourTree.FAILURE] = {
     "background-color": "red"
   };
   BehaviourTree.styles[BehaviourTree.RUNNING] = {
-    "background-color": "yellow"
+    "background-color": "navy"
   };
   BehaviourTree.styles[BehaviourTree.PENDING] = {
-    "background-color": "grey"
+    "background-color": "silver"
   };
 
   BehaviourTree.layout = {
@@ -116,6 +116,7 @@ var BehaviourTree = function() {
           selector: 'node',
           style: {
             'content': 'data(description)',
+            'background-image' : 'data(image)'
           }
         },
       ],
@@ -151,6 +152,7 @@ var BehaviourTree = function() {
     // refresh the view
     this.map(function(bt_node) {
       bt_node.chart_node.style(BehaviourTree.styles[bt_node.state]);
+      bt_node.chart_node.style(bt_node.style);
     });
   };
   

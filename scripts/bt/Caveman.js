@@ -73,7 +73,7 @@ var Caveman = function() {
                     return this.state = BehaviourTree.SUCCESS;
                   }
                   else {
-                    console.log("caveman eating berry", Math.floor(caveman.progress*100) + "%");
+                    //console.log("caveman eating berry", Math.floor(caveman.progress*100) + "%");
                     return this.state = BehaviourTree.RUNNING;                    
                   }
                 }
@@ -105,7 +105,7 @@ var Caveman = function() {
                 });
               }
               else {
-                console.log("harvesting berry", Math.floor(caveman.progress*100) + "%");
+                //console.log("harvesting berry", Math.floor(caveman.progress*100) + "%");
                 return this.state = BehaviourTree.RUNNING;                    
               }
 

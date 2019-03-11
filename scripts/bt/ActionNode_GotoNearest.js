@@ -36,6 +36,7 @@ var ActionNode_GotoNearest = function() {
 
   ActionNode_GotoNearest.prototype.map = BehaviourNode.prototype.map;  
   ActionNode_GotoNearest.prototype.map_children = BehaviourNode.prototype.map_children;  
+  ActionNode_GotoNearest.prototype.style = BehaviourNode.prototype.style; 
 
   // ------------------------------------------------------------------------------------------
   // UPDATE
