@@ -94,11 +94,7 @@ var main = function() {
     }
   });
 
-  // ----------------------------------------------------------------------------
-  // START REQUESTING ANIMATION FRAME
-  // ----------------------------------------------------------------------------
-
-  function update(dt) {
+  var _on_resize = function(event) {
     var can = ctx.canvas;
     var dest_can = dest_ctx.canvas
     dest_can.width = window.innerWidth;
@@ -108,6 +104,18 @@ var main = function() {
     dest_ctx.off_x = (dest_can.width - can.width*dest_ctx.global_scale)*0.5;
     dest_ctx.off_y = (dest_can.height - can.height*dest_ctx.global_scale)*0.5;
 
+    if(cy.layout) {
+      cy.layout.run();
+    }
+  };
+  window.addEventListener('resize', _on_resize);
+  _on_resize(); 
+
+  // ----------------------------------------------------------------------------
+  // START REQUESTING ANIMATION FRAME
+  // ----------------------------------------------------------------------------
+
+  function update(dt) {
     babysitter.update(dt);
   }
 

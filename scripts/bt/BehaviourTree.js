@@ -58,6 +58,12 @@ var BehaviourTree = function() {
     "background-color": "grey"
   };
 
+  BehaviourTree.layout = {
+    name: 'dagre',
+    padding: 0,
+    nodeSep: 100
+  };   
+
   // ------------------------------------------------------------------------------------------
   // CHILDREN
   // ------------------------------------------------------------------------------------------
@@ -113,12 +119,6 @@ var BehaviourTree = function() {
           }
         },
       ],
-
-      layout: {
-        name: 'dagre',
-        padding: 0,
-        nodeSep: 100
-      },    
     
       elements: {
         nodes: nodes,
@@ -130,7 +130,9 @@ var BehaviourTree = function() {
       bt_node.chart_node = chart.$("#" + bt_node.name + "");
     });
 
-    this.chart = chart;
+    cy.chart = this.chart = chart;
+    cy.layout = chart.layout(BehaviourTree.layout);
+    cy.layout.run();    
   }
 
   // ------------------------------------------------------------------------------------------
