@@ -85,7 +85,8 @@ var BehaviourTree = function() {
     this.map(function(bt_node) {
       nodes.push({
         data : {
-          id: bt_node.name
+          id: bt_node.name,
+          description : bt_node.description
         }
       });
       if(bt_node.parent && bt_node.parent.name) {
@@ -108,13 +109,15 @@ var BehaviourTree = function() {
         {
           selector: 'node',
           style: {
-            'content': 'data(id)',
+            'content': 'data(description)',
           }
         },
       ],
 
       layout: {
-        name: 'dagre'
+        name: 'dagre',
+        padding: 0,
+        nodeSep: 100
       },    
     
       elements: {

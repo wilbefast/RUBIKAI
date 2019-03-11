@@ -42,10 +42,15 @@ var ActionNode_GotoNearest = function() {
   // ------------------------------------------------------------------------------------------
 
   ActionNode_GotoNearest.prototype.update = function(dt, args) {
+    if(this.such_that(args.tile)) {
+      delete args.path;
+      console.log(this.name, "go to nearest success");
+      return this.state = BehaviourTree.SUCCESS; 
+    }
+
     if(!args.path) {
       args.path = astar.get_path_to_any(args.tile, this.such_that);
       args.timer = 0.5;
-      return this.state = BehaviourTree.RUNNING; 
     }
 
     if (args.path.length > 0) {
@@ -64,7 +69,7 @@ var ActionNode_GotoNearest = function() {
       return this.state = BehaviourTree.RUNNING; 
     }
     else {
-      args.path = null;
+      delete args.path;
       console.log(this.name, "go to nearest success");
       return this.state = BehaviourTree.SUCCESS; 
     }

@@ -29,7 +29,7 @@ var BehaviourNode = function() {
   var BehaviourNode = function(args) {
 
     // check parameters
-    useful.copy_entries(args, this, [ "parent", "name" ]);
+    useful.copy_entries(args, this, [ "parent", "name", "description" ]);
     if(args.update) {
       // custom update
       this.update = args.update;

@@ -43,8 +43,8 @@ var TileObject = function() {
   }
 
   TileObject.prototype.on_purge = function() {
-    this.tile.contents = null;
-    this.tile = null;
+    delete this.tile.contents;
+    delete this.tile;
   }
 
   TileObject.prototype.set_tile = function(new_tile) {
