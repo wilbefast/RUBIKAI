@@ -81,58 +81,68 @@ var BehaviourTree = function() {
   // RENDERING
   // ------------------------------------------------------------------------------------------
 
-  BehaviourTree.prototype.build_chart = function() {
-
+  BehaviourTree.prototype.build_chart = function(args) {
     useful.assert(!this.chart, "Only 1 chart can exist at a time");
 
+    var hash = args.hash;
     var nodes = [];
     var edges = [];
 
     this.map(function(bt_node) {
       nodes.push({
+        group : "nodes",
         data : {
-          id: bt_node.name,
+          id:  bt_node.name + hash,
           description : bt_node.description
         }
       });
       if(bt_node.parent && bt_node.parent.name) {
         edges.push({
+          group : "edges",
           data : {
-            source : bt_node.parent.name,
-            target : bt_node.name
+            source : bt_node.parent.name + hash,
+            target : bt_node.name + hash
           }
         });
       }
     });
 
-    var chart = cytoscape({
-      container: document.getElementById('cytoscape'),
-    
-      boxSelectionEnabled: false,
-      autounselectify: true,
-    
-      style: [
-        {
-          selector: 'node',
-          style: {
-            'content': 'data(description)',
-            'background-image' : 'data(image)'
-          }
+    var chart = cy.chart;
+    if(!chart) {
+      chart = cytoscape({
+        container: document.getElementById('cytoscape'),
+      
+        boxSelectionEnabled: false,
+        autounselectify: true,
+      
+        style: [
+          {
+            selector: 'node',
+            style: {
+              'content': 'data(description)'
+            }
+          },
+        ],
+      
+        elements: {
+          nodes: nodes,
+          edges: edges
         },
-      ],
-    
-      elements: {
-        nodes: nodes,
-        edges: edges
-      },
-    }); 
+      }); 
+
+      cy.chart = chart;
+    }
+    else {
+      chart.add(nodes);
+      chart.add(edges);
+    }
     
     this.map(function(bt_node) {
-      bt_node.chart_node = chart.$("#" + bt_node.name + "");
+      bt_node.chart_node = chart.$("#" + bt_node.name + hash + "");
     });
-
-    cy.chart = this.chart = chart;
-    cy.layout = chart.layout(BehaviourTree.layout);
+    
+    this.chart = chart;
+    cy.layout = chart.layout(BehaviourTree.layout);      
     cy.layout.run();    
   }
 

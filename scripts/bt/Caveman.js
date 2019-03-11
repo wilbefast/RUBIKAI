@@ -132,7 +132,7 @@ var Caveman = function() {
           }
         });
 
-    behaviour_tree.build_chart();
+    behaviour_tree.build_chart(caveman);
         
     return behaviour_tree;
   }

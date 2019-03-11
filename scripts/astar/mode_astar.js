@@ -27,6 +27,7 @@ var mode_astar = function() {
     // clean up
     mutex.force_release();    
     objects.clear();
+    delete cy.chart;    
 
     // hide cytoscape
     cy.style.display = "none";

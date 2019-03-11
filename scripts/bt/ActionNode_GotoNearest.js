@@ -45,7 +45,6 @@ var ActionNode_GotoNearest = function() {
   ActionNode_GotoNearest.prototype.update = function(dt, args) {
     if(this.such_that(args.tile)) {
       delete args.path;
-      console.log(this.name, "go to nearest success");
       return this.state = BehaviourTree.SUCCESS; 
     }
 
