@@ -29,6 +29,9 @@ var mode_genetic = function() {
     mutex.force_release();    
     objects.clear();
 
+    // hide cytoscape
+    cy.style.display = "none";
+
     // set random seed, for easier debugging
     Math.seedrandom('So if the infection wipes us all out- that is a return to normality.');
 

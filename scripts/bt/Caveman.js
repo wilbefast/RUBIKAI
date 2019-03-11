@@ -65,7 +65,7 @@ var Caveman = function() {
                   return this.state = BehaviourTree.FAILURE;                    
                 }
                 else {
-                  caveman.progress = (caveman.progress || 0) + 3*dt;
+                  caveman.progress = (caveman.progress || 0) + dt;
                   if(caveman.progress > 1) {
                     caveman.has_berry = false;
                     delete caveman.progress;
@@ -95,7 +95,7 @@ var Caveman = function() {
             description : "Harvest berry",                          
             parent : near_berry,
             update : function(dt) {
-              caveman.progress = (caveman.progress || 0) + 3*dt;
+              caveman.progress = (caveman.progress || 0) + dt;
               if(caveman.progress > 1) {
                 caveman.tile.map_neighbours("4", function(n) {
                   if(n.contents && n.contents.is_berry) {

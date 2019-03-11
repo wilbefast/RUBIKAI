@@ -53,6 +53,9 @@ var mode_bt = function() {
     mutex.force_release();
     objects.clear();
 
+    // hide show
+    cy.style.display = "initial";
+
     // set tile types
     Tile.prototype.tile_types = {
       wall : {

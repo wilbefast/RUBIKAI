@@ -21,7 +21,8 @@ Lesser General Public License for more details.
 // global variables: we'd want to do this more cleanly if this were a 'real' project
 var ctx;
 var grid;
-var mode; 
+var mode;
+var cy; 
 
 var main = function() {
 
@@ -36,6 +37,12 @@ var main = function() {
   var dest_ctx = document.getElementById("destination_canvas").getContext("2d");
   dest_ctx.off_x = 0;
   dest_ctx.off_y = 0;
+
+  // ----------------------------------------------------------------------------
+  // GET CYTOSCAPE
+  // ----------------------------------------------------------------------------
+
+  cy = document.getElementById("cytoscape");
 
   // ----------------------------------------------------------------------------
   // INITIAL MODE

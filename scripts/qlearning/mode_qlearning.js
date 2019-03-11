@@ -31,6 +31,9 @@ var mode_qlearning = function() {
     mutex.force_release();    
     objects.clear();
 
+    // hide cytoscape
+    cy.style.display = "none";
+
     // set tile types
     Tile.prototype.tile_types = {
       free : {
