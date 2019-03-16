@@ -30,32 +30,72 @@ var mode_genetic = function() {
     objects.clear();
     delete cy.chart;    
 
-    // hide cytoscape
-    cy.style.display = "none";
+    // show cytoscape
+    cy.style.display = "initial";    
+    var nodes = [];
+    var edges = [];
+    nodes.push({
+      group : "nodes",
+      data : {
+        id:  "TOTO"
+      }
+    });
+    nodes.push({
+      group : "nodes",      
+      data : {
+        id:  "TATA"
+      }
+    });
+    edges.push({
+      group : "edges",      
+      data : {
+        source : "TOTO",
+        target : "TATA"
+      }
+    });
 
+    cy.chart = cytoscape({
+      container: document.getElementById('cytoscape'),
+    
+      boxSelectionEnabled: false,
+      autounselectify: true,
+
+      layout: {
+        name: 'breadthfirst',
+        directed: true,
+        padding: 10
+      },
+
+      style: [
+        {
+          selector: 'node',
+          style: {
+            'content': 'data(id)'
+          },
+        },
+      ],
+    
+      elements: {
+        nodes: nodes,
+        edges: edges
+      },
+    }); 
+   
     // set random seed, for easier debugging
     Math.seedrandom('So if the infection wipes us all out- that is a return to normality.');
 
-    // TODO: the grid is not currently used
-    const size = 5;
-    grid = new Grid({
-      n_cols : size,
-      n_rows : size,
-      tile_class : WeightTile,
-      tile_draw_w : 512 / size,
-      tile_draw_h : 512 / size,
-      off_x : -ctx.canvas.width*0.25
-    });
+    // no grid is used for this mode
+    grid = null;
 
     // learn to run
     zombierun.init({
       off_x : ctx.canvas.width*0.25,
-      draw_w : grid.draw_w,
-      draw_h : grid.draw_h
+      draw_w : 512,
+      draw_h : 512
     });
     babysitter.add(genetic.play, {
       game : zombierun,
-      size : size,
+      size : 5,
     });
   }
 

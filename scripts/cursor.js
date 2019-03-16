@@ -33,13 +33,15 @@ var cursor = function() {
       return;
     }
     
-    // hover over tiles
-    var new_tile = grid.pixel_to_tile(cursor.x, cursor.y);
-  
-    if(new_tile != cursor.tile) {
-      cursor.tile = new_tile;
-      if(cursor.DEBUG) {
-        console.log("hovering", new_tile.col, new_tile.row);
+    if(grid) {
+      // hover over tiles
+      var new_tile = grid.pixel_to_tile(cursor.x, cursor.y);
+    
+      if(new_tile != cursor.tile) {
+        cursor.tile = new_tile;
+        if(cursor.DEBUG) {
+          console.log("hovering", new_tile.col, new_tile.row);
+        }
       }
     }
   }

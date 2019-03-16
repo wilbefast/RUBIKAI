@@ -48,7 +48,7 @@ var main = function() {
   // INITIAL MODE
   // ----------------------------------------------------------------------------
 
-  mode = mode_bt;
+  mode = mode_genetic;
   mode.init();
 
   // ----------------------------------------------------------------------------
@@ -126,7 +126,9 @@ var main = function() {
 
     ctx.save();
       ctx.translate(ctx.off_x + 0.5, ctx.off_y + 0.5); // the 0.5 prevents blurred lines
-      grid.draw();
+      if(grid) {
+        grid.draw();
+      }
       objects.draw();
       if(mode.draw) {
         mode.draw();

@@ -84,7 +84,7 @@ var mode_qlearning = function() {
       episodes_per_sample : 500,
       qlog : _qlog,
       learning_ratio : 0.8,
-      discount_factor : 0.95,
+      discount_factor : 0.8,
       n_episodes : 4000
     });
   }

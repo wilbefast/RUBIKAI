@@ -57,6 +57,7 @@ var zombierun = function() {
   var zombie_friction = 1.02;  
   var zombie_grab_distance = 0.03;
   var zombie_bounce = 0.07;
+  var zombie_heartbeat = 0;
  
   // ------------------------------------------------------------------------------------------
   // PRIVATE FUNCTIONS
@@ -88,6 +89,7 @@ var zombierun = function() {
     var zombie_angle = Math.random()*Math.PI;
     zombie_x = 0.5 * (1 + Math.cos(zombie_angle));
     zombie_y = 0.5 * (1 + Math.sin(zombie_angle));
+    zombie_heartbeat = 0;
 
     // reset control input
     human_ctrl_x = human_ctrl_y = 0;
@@ -139,6 +141,10 @@ var zombierun = function() {
     human_dy += human_ctrl_y*human_acceleration;
 
     // update zombie physics
+    zombie_heartbeat += Math.random()*0.2;
+    if(zombie_heartbeat > 1) {
+      zombie_heartbeat -= 1;
+    }
     zombie_x += zombie_dx;
     zombie_y += zombie_dy;
     if(zombie_x > 1) {
@@ -173,7 +179,7 @@ var zombierun = function() {
       zombierun.reset();
     }
     else {
-      var a = Math.random() * zombie_acceleration;
+      var a = (0.5 + 0.25 * (1 + Math.cos(zombie_heartbeat * Math.PI * 2))) * zombie_acceleration;
       zombie_dx += chase.x*a;
       zombie_dy += chase.y*a;
     }

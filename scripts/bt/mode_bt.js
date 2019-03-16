@@ -54,7 +54,7 @@ var mode_bt = function() {
     objects.clear();
     delete cy.chart;
 
-    // hide show
+    // show cytoscape    
     cy.style.display = "initial";
 
     // set tile types
