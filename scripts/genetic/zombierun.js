@@ -173,9 +173,11 @@ var zombierun = function() {
     }
 
     // make zombie chase human
+    var was_human_killed = false;
     var chase = vector.normalise(human_x - zombie_x, human_y - zombie_y);
     if(chase.originalLength < zombie_grab_distance) {
       // nom nom nom nom nom
+      was_human_killed = true;
       zombierun.reset();
     }
     else {
@@ -183,6 +185,9 @@ var zombierun = function() {
       zombie_dx += chase.x*a;
       zombie_dy += chase.y*a;
     }
+
+    // was the human killed?
+    return was_human_killed;
   }
 
   zombierun.draw = function() {
@@ -197,6 +202,18 @@ var zombierun = function() {
     // draw zombie
     ctx.fillStyle = "green";            
     ctx.fillRect(draw_x + zombie_x*draw_w - 8, draw_y + zombie_y*draw_h - 8, 16, 16);
+  }
+
+  zombierun.copy_state_to = function(array) {
+    useful.assert(array, "An array must be provided as input");
+    array[0] = human_x;
+    array[1] = human_y;
+    array[2] = human_dx;
+    array[3] = human_dy;
+    array[4] = zombie_x;
+    array[5] = zombie_y;
+    array[6] = zombie_dx;
+    array[7] = zombie_dy;
   }
 
   // ------------------------------------------------------------------------------------------

@@ -87,15 +87,18 @@ var mode_genetic = function() {
     // no grid is used for this mode
     grid = null;
 
-    // learn to run
+    // set up the game
     zombierun.init({
       off_x : ctx.canvas.width*0.25,
       draw_w : 512,
       draw_h : 512
     });
+
+    // run the game
+    var stop = false;
     babysitter.add(genetic.play, {
       game : zombierun,
-      size : 5,
+      run_count : 1000
     });
   }
 
