@@ -73,7 +73,7 @@ var genetic = function() {
       game.reset();
       var human_died = false;
       var run_length = 0;
-      while(!human_died && run_length < 6000) {
+      while(!human_died && run_length < 10000) {
         // first layer: "input"
         game.copy_state_to(_input);
   
@@ -100,18 +100,48 @@ var genetic = function() {
         var human_died = game.update();
         if(!human_died) {
           run_length++;
-          if(run_length > best_solution_run_length) {
-            best_solution_run_length = run_length;
-            best_solution = solution;
-          }
-        }
-        else {
-          console.log("run", r, "length was", run_length);
         }
       }  
+      
+      // check whether the latest run was the best yet
+      console.log("run", r, "length was", run_length);
+      if(run_length > best_solution_run_length) {
+        best_solution_run_length = run_length;
+        best_solution = solution;
+      }
     }
 
     console.log("best run length was", best_solution_run_length);
+    var input_to_hidden = best_solution.input_to_hidden;
+    var hidden_to_output = best_solution.hidden_to_output;
+    game.reset();
+    while(true) {
+      // first layer: "input"
+      game.copy_state_to(_input);
+
+      // second layer: "hidden"
+      for(var h = 0; h < _hidden_layer_size; h++) {  
+        _hidden[h] = 0;
+        for(var i = 0; i < _input_layer_size; i++) {
+          _hidden[h] += _input[i] * input_to_hidden[i][h];
+        }
+      }
+
+      // third layer: "output"
+      for(var o = 0; o < _output_layer_size; o++) {  
+        _output[o] = 0;
+        for(var h = 0; h < _hidden_layer_size; h++) {
+          _output[o] += _hidden[h] * hidden_to_output[h][o];
+        }
+      }
+
+      // the output is used as a virtual joystick
+      game.control(_output[0], _output[1]);
+
+      // update the game
+      var human_died = game.update();
+      yield * babysitter.waitForNextFrame();
+    }  
   }
   
   // ------------------------------------------------------------------------------------------
