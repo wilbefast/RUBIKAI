@@ -94,12 +94,29 @@ var mode_genetic = function() {
       draw_h : 512
     });
 
-    // run the game
-    var stop = false;
-    babysitter.add(genetic.play, {
-      game : zombierun,
-      run_count : 1000
-    });
+    var keyboard_control = false;
+    if(keyboard_control) {
+      // player control using the keyboard
+      babysitter.add(function*() {
+        zombierun.reset();
+        while(true) {  
+          zombierun.control(keyboard.x, keyboard.y);
+          var human_died = zombierun.update();
+          if(human_died) {
+            zombierun.reset();
+          }
+          yield * babysitter.waitForNextFrame();
+        }  
+      });
+    }
+    else {
+      // run the game
+      babysitter.add(genetic.evolve_to_play, {
+        game : zombierun,
+        run_count : 1000
+      });
+    }
+
   }
 
   mode_genetic.left_click = function(tile) {

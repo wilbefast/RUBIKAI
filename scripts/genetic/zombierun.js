@@ -27,6 +27,8 @@ var zombierun = function() {
   // PRIVATE CONSTANTS
   // ------------------------------------------------------------------------------------------
 
+  const human_max_stamina = 100;
+
   // ------------------------------------------------------------------------------------------
   // PRIVATE VARIABLES
   // ------------------------------------------------------------------------------------------
@@ -40,10 +42,11 @@ var zombierun = function() {
   var human_y = 0.5;
   var human_dx = 0;
   var human_dy = 0;
-  var human_acceleration = 0.0008;
+  var human_acceleration = 0.0012;
   var human_maxspeed = 0.08;
   var human_friction = 1.05;
   var human_bounce = 0.9;
+  var human_stamina = human_max_stamina;
 
   var human_ctrl_x = 0;
   var human_ctrl_y = 0;
@@ -52,17 +55,15 @@ var zombierun = function() {
   var zombie_y = 0;
   var zombie_dx = 0;
   var zombie_dy = 0;
-  var zombie_acceleration = 0.001;
+  var zombie_base_acceleration = 0.001;
+  var zombie_acceleration = zombie_base_acceleration;
+  var zombie_acceleration_increase = 0.000001;
   var zombie_maxspeed = 0.1;
   var zombie_friction = 1.02;  
   var zombie_grab_distance = 0.03;
   var zombie_bounce = 0.07;
   var zombie_heartbeat = 0;
  
-  // ------------------------------------------------------------------------------------------
-  // PRIVATE FUNCTIONS
-  // ------------------------------------------------------------------------------------------
-
   // ------------------------------------------------------------------------------------------
   // PUBLIC FUNCTION
   // ------------------------------------------------------------------------------------------
@@ -85,11 +86,14 @@ var zombierun = function() {
   zombierun.reset = function() {
     // reset speed and position of zombie and human
     human_dx = human_dy = zombie_dx = zombie_dy = 0;
+    human_ctrl_x = human_ctrl_y = 0;
     human_x = human_y = 0.5;
+    human_stamina = human_max_stamina;
     var zombie_angle = Math.random()*Math.PI;
     zombie_x = 0.5 * (1 + Math.cos(zombie_angle));
     zombie_y = 0.5 * (1 + Math.sin(zombie_angle));
-    zombie_heartbeat = 0;
+    zombie_heartbeat = Math.random();
+    zombie_acceleration = zombie_base_acceleration;
 
     // reset control input
     human_ctrl_x = human_ctrl_y = 0;
@@ -137,8 +141,15 @@ var zombierun = function() {
     }
 
     // make human move based on input
-    human_dx += human_ctrl_x*human_acceleration;
-    human_dy += human_ctrl_y*human_acceleration;
+    var control_l = vector.len(human_ctrl_x, human_ctrl_y);
+    useful.assert(control_l <= 1.01 && control_l >= 0, "Input should be normalised");
+    var acceleration = human_stamina/human_max_stamina*human_acceleration;
+    human_dx += human_ctrl_x*acceleration;
+    human_dy += human_ctrl_y*acceleration;
+
+    // consume human stamina based on input
+    human_stamina += 0.5 - control_l;
+    human_stamina = useful.clamp(human_stamina, 0, human_max_stamina);
 
     // update zombie physics
     zombie_heartbeat += Math.random()*0.2;
@@ -186,6 +197,9 @@ var zombierun = function() {
       zombie_dy += chase.y*a;
     }
 
+    // the zombie gets harder very gradually
+    zombie_acceleration += zombie_acceleration_increase;
+
     // was the human killed?
     return was_human_killed;
   }
@@ -196,7 +210,7 @@ var zombierun = function() {
     ctx.fillRect(draw_x, draw_y, draw_w, draw_h);
 
     // draw human
-    ctx.fillStyle = "orange";            
+    ctx.fillStyle = "rgb(" + 255*human_stamina/human_max_stamina + ", 0, 100)";            
     ctx.fillRect(draw_x + human_x*draw_w - 8, draw_y + human_y*draw_h - 8, 16, 16);
 
     // draw zombie
@@ -206,14 +220,15 @@ var zombierun = function() {
 
   zombierun.copy_state_to = function(array) {
     useful.assert(array, "An array must be provided as input");
-    array[0] = human_x;
-    array[1] = human_y;
+    array[0] = 2*human_x - 1;
+    array[1] = 2*human_y - 1;
     array[2] = human_dx;
     array[3] = human_dy;
-    array[4] = zombie_x;
-    array[5] = zombie_y;
+    array[4] = 2*zombie_x - 1;
+    array[5] = 2*zombie_y - 1;
     array[6] = zombie_dx;
     array[7] = zombie_dy;
+    array[8] = 2*human_stamina/human_max_stamina - 1;
   }
 
   // ------------------------------------------------------------------------------------------

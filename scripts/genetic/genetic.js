@@ -20,7 +20,7 @@ Lesser General Public License for more details.
 
 var genetic = function() {
 
-  const _input_layer_size = 8;
+  const _input_layer_size = 9;
   const _hidden_layer_size = 8;
   const _output_layer_size = 2;
 
@@ -54,7 +54,7 @@ var genetic = function() {
   var genetic = {
   };
   
-  genetic.play = function *(args) {
+  genetic.evolve_to_play = function *(args) {
     // unpacks arguments
     const game = args.game;
     const verbose = args.verbose;
