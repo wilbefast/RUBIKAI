@@ -277,6 +277,36 @@ var genetic = function() {
       console.warn("the run was cut short to prevent a forever loop");
     }
 
+    // set weights in chart to those we found in our solution
+    var input_to_hidden = best_solution.input_to_hidden;
+    var hidden_to_output = best_solution.hidden_to_output;
+    for(var i = 0; i < _input_layer_size; i++) {
+      for(var h = 0; h < _hidden_layer_size; h++) {
+        var weight = input_to_hidden[i][h];
+        var abs_weight = Math.abs(weight);
+        cy.chart.$("edge[source = 'input_" + i + "'][target = 'hidden_" + h + "']")
+        .style({
+          "line-color" : weight > 0 
+            ? "rgb(" + weight*255 + ", 0, 0)"
+            : "rgb(0, 0, " + (-weight)*255 + ")",
+          "width" : abs_weight*abs_weight*abs_weight*6
+        });
+      }
+    }
+    for(var h = 0; h < _hidden_layer_size; h++) {
+      for(var o = 0; o < _output_layer_size; o++) {
+        var weight = hidden_to_output[h][o];
+        var abs_weight = Math.abs(weight);
+        cy.chart.$("edge[source = 'hidden_" + h + "'][target = 'output_" + o + "']")
+        .style({
+          "line-color" : weight > 0 
+            ? "rgb(" + weight*255 + ", 0, 0)"
+            : "rgb(0, 0, " + (-weight)*255 + ")",
+          "width" : abs_weight*abs_weight*abs_weight*6
+        });
+      }
+    }
+
     // run the game with the solution we found
     var stop = false;
     while(!stop) {
