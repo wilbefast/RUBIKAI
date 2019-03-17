@@ -32,54 +32,6 @@ var mode_genetic = function() {
 
     // show cytoscape
     cy.style.display = "initial";    
-    var nodes = [];
-    var edges = [];
-    nodes.push({
-      group : "nodes",
-      data : {
-        id:  "TOTO"
-      }
-    });
-    nodes.push({
-      group : "nodes",      
-      data : {
-        id:  "TATA"
-      }
-    });
-    edges.push({
-      group : "edges",      
-      data : {
-        source : "TOTO",
-        target : "TATA"
-      }
-    });
-
-    cy.chart = cytoscape({
-      container: document.getElementById('cytoscape'),
-    
-      boxSelectionEnabled: false,
-      autounselectify: true,
-
-      layout: {
-        name: 'breadthfirst',
-        directed: true,
-        padding: 10
-      },
-
-      style: [
-        {
-          selector: 'node',
-          style: {
-            'content': 'data(id)'
-          },
-        },
-      ],
-    
-      elements: {
-        nodes: nodes,
-        edges: edges
-      },
-    }); 
    
     // set random seed, for easier debugging
     Math.seedrandom('So if the infection wipes us all out- that is a return to normality.');
@@ -94,7 +46,7 @@ var mode_genetic = function() {
       draw_h : 512
     });
 
-    var keyboard_control = true;
+    var keyboard_control = false;
     if(keyboard_control) {
       // player control using the keyboard
       babysitter.add(function*() {

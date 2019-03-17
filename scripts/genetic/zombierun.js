@@ -269,6 +269,21 @@ var zombierun = function() {
     array[9] = 2*zombie_lifespan/zombie_max_lifespan - 1;
   }
 
+  zombierun.get_state_descriptions = function() {
+    return [
+      "human_x",
+      "human_y",
+      "human_dx",
+      "human_dy",
+      "zombie_x",
+      "zombie_y",
+      "zombie_dx",
+      "zombie_dy",
+      "human_stamina",
+      "zombie_life"
+    ]
+  }
+
   // ------------------------------------------------------------------------------------------
   // EXPORT
   // ------------------------------------------------------------------------------------------

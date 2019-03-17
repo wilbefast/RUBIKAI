@@ -39,6 +39,85 @@ var genetic = function() {
   // PRIVATE FUNCTIONS
   // ------------------------------------------------------------------------------------------
   
+  const _build_chart = function(state_descriptions) {
+    
+    var nodes = [];
+    var edges = [];
+
+    for(var i = 0; i < _input_layer_size; i++) {
+      nodes.push({
+        group : "nodes",
+        data : {
+          id: "input_" + i,
+          description : state_descriptions[i]
+        }
+      });
+    }
+    for(var h = 0; h < _hidden_layer_size; h++) {
+      nodes.push({
+        group : "nodes",
+        data : {
+          id: "hidden_" + h,
+          description : "hidden_" + h
+        }
+      });
+      for(var i = 0; i < _input_layer_size; i++) {
+        edges.push({
+          group : "edges",
+          data : {
+            source: "input_" + i,
+            target : "hidden_" + h
+          }
+        });
+      }
+    }
+    for(var o = 0; o < _output_layer_size; o++) {
+      nodes.push({
+        group : "nodes",
+        data : {
+          id: "output_" + o,
+          description : o === 0 ? "x" : "y"
+        }
+      });
+      for(var h = 0; h < _hidden_layer_size; h++) {
+        edges.push({
+          group : "edges",
+          data : {
+            source: "hidden_" + h,
+            target : "output_" + o
+          }
+        });
+      }
+    }
+
+    cy.chart = cytoscape({
+      container: document.getElementById('cytoscape'),
+    
+      boxSelectionEnabled: false,
+      autounselectify: true,
+
+      layout: {
+        name: 'breadthfirst',
+        directed: true,
+        padding: 10
+      },
+
+      style: [
+        {
+          selector: 'node',
+          style: {
+            'content': 'data(description)'
+          },
+        },
+      ],
+    
+      elements: {
+        nodes: nodes,
+        edges: edges
+      },
+    }); 
+  }
+
   const _create_random_solution = function() {
     var input_to_hidden = new Array(_input_layer_size);
     for(var i = 0; i < _input_layer_size; i++) {
@@ -159,6 +238,10 @@ var genetic = function() {
       console.warn("the run was cut short to prevent a forever loop");
     }
     
+    // build the chart to display the graph working
+    var state_descriptions = game.get_state_descriptions();
+    _build_chart(state_descriptions);
+
     // run the game with the solution we found
     var stop = false;
     while(!stop) {
