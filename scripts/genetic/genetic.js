@@ -20,8 +20,8 @@ Lesser General Public License for more details.
 
 var genetic = function() {
 
-  const _input_layer_size = 9;
-  const _hidden_layer_size = 8;
+  const _input_layer_size = 10;
+  const _hidden_layer_size = 10;
   const _output_layer_size = 2;
 
   const _input = new Array(_input_layer_size);
