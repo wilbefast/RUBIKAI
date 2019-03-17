@@ -20,6 +20,13 @@ Lesser General Public License for more details.
 
 var genetic = function() {
 
+  var genetic = {
+  };
+
+  // ------------------------------------------------------------------------------------------
+  // PRIVATE CONSTANTS
+  // ------------------------------------------------------------------------------------------
+
   const _input_layer_size = 10;
   const _hidden_layer_size = 10;
   const _output_layer_size = 2;
@@ -28,6 +35,10 @@ var genetic = function() {
   const _hidden = new Array(_hidden_layer_size);
   const _output = new Array(_output_layer_size);
 
+  // ------------------------------------------------------------------------------------------
+  // PRIVATE FUNCTIONS
+  // ------------------------------------------------------------------------------------------
+  
   const _create_random_solution = function() {
     var input_to_hidden = new Array(_input_layer_size);
     for(var i = 0; i < _input_layer_size; i++) {
@@ -51,71 +62,27 @@ var genetic = function() {
     }
   }
 
-  var genetic = {
-  };
-  
-  genetic.evolve_to_play = function *(args) {
-    // unpacks arguments
-    const game = args.game;
-    const verbose = args.verbose;
-    const run_count = args.run_count;
-
-    // play multiple times 
-    var best_solution = null;
-    var best_solution_run_length = -Infinity;
-    for(var r = 0; r < run_count; r++) {
-      // create a random solution
-      var solution = _create_random_solution();
-      var input_to_hidden = solution.input_to_hidden;
-      var hidden_to_output = solution.hidden_to_output;
-
-      // restart game play until we die
-      game.reset();
-      var human_died = false;
-      var run_length = 0;
-      while(!human_died && run_length < 10000) {
-        // first layer: "input"
-        game.copy_state_to(_input);
-  
-        // second layer: "hidden"
-        for(var h = 0; h < _hidden_layer_size; h++) {  
-          _hidden[h] = 0;
-          for(var i = 0; i < _input_layer_size; i++) {
-            _hidden[h] += _input[i] * input_to_hidden[i][h];
-          }
-        }
-  
-        // third layer: "output"
-        for(var o = 0; o < _output_layer_size; o++) {  
-          _output[o] = 0;
-          for(var h = 0; h < _hidden_layer_size; h++) {
-            _output[o] += _hidden[h] * hidden_to_output[h][o];
-          }
-        }
-  
-        // the output is used as a virtual joystick
-        game.control(_output[0], _output[1]);
-  
-        // update the game
-        var human_died = game.update();
-        if(!human_died) {
-          run_length++;
-        }
-      }  
-      
-      // check whether the latest run was the best yet
-      console.log("run", r, "length was", run_length);
-      if(run_length > best_solution_run_length) {
-        best_solution_run_length = run_length;
-        best_solution = solution;
-      }
+  const _get_average_run_length = function * (args) {
+    var number_of_runs_to_average = args.number_of_runs_to_average;
+    var total_length_of_runs = 0;
+    for(var r = 0; r < number_of_runs_to_average; r++) {
+      total_length_of_runs += yield * _get_run_length(args);
     }
+    return total_length_of_runs / number_of_runs_to_average;
+  }
 
-    console.log("best run length was", best_solution_run_length);
-    var input_to_hidden = best_solution.input_to_hidden;
-    var hidden_to_output = best_solution.hidden_to_output;
+  const _get_run_length = function * (args) {
+    const game = args.game;
+    const max_run_length = args.max_run_length || Infinity;
+    const input_to_hidden = args.solution.input_to_hidden;
+    const hidden_to_output = args.solution.hidden_to_output;
+    const verbose = args.verbose;
+
+    // restart game play until we die
     game.reset();
-    while(true) {
+    var human_died = false;
+    var run_length = 0;
+    while(!human_died && run_length < max_run_length) {
       // first layer: "input"
       game.copy_state_to(_input);
 
@@ -140,8 +107,68 @@ var genetic = function() {
 
       // update the game
       var human_died = game.update();
-      yield * babysitter.waitForNextFrame();
-    }  
+      if(!human_died) {
+        run_length++;
+      }
+
+      // pause to render the game state if verbose
+      if(verbose) {
+        yield * babysitter.waitForNextFrame();
+      }
+    }
+    
+    return run_length;
+  }
+
+  // ------------------------------------------------------------------------------------------
+  // PUBLIC CONSTANTS
+  // ------------------------------------------------------------------------------------------
+
+  genetic.evolve_to_play = function *(args) {
+    // unpacks arguments
+    const game = args.game;
+    const verbose = args.verbose;
+    const run_count = args.run_count;
+    const max_run_length = args.max_run_length;
+
+    // play multiple times 
+    var best_solution = null;
+    var best_solution_run_length = -Infinity;
+    for(var r = 0; r < run_count; r++) {
+      // create a random solution
+      var solution = _create_random_solution();
+
+      // run through game with this solution
+      var run_length = yield * _get_average_run_length({
+        game : game,
+        number_of_runs_to_average : 10,
+        max_run_length : max_run_length,
+        solution : solution
+      });
+
+      // check whether the latest run was the best yet
+      if(run_length > best_solution_run_length) {
+        best_solution_run_length = run_length;
+        best_solution = solution;
+      }
+    }
+
+    // print results
+    console.log("best solution of", run_count, "had average length", best_solution_run_length);
+    if(best_solution_run_length >= max_run_length) {
+      console.warn("the run was cut short to prevent a forever loop");
+    }
+    
+    // run the game with the solution we found
+    var stop = false;
+    while(!stop) {
+      var run_length = yield * _get_run_length({
+        game : game,
+        solution : best_solution,
+        verbose : true
+      });
+      console.log("last run had length", run_length);
+    }
   }
   
   // ------------------------------------------------------------------------------------------
