@@ -76,7 +76,7 @@ var genetic = function() {
         group : "nodes",
         data : {
           id: "output_" + o,
-          description : o === 0 ? "x" : "y"
+          description : o === 0 ? "X" : "Y"
         }
       });
       for(var h = 0; h < _hidden_layer_size; h++) {
@@ -99,7 +99,7 @@ var genetic = function() {
       layout: {
         name: 'breadthfirst',
         directed: true,
-        padding: 10
+        padding: 100
       },
 
       style: [
@@ -164,20 +164,55 @@ var genetic = function() {
     while(!human_died && run_length < max_run_length) {
       // first layer: "input"
       game.copy_state_to(_input);
+      if(verbose) {
+        for(var i = 0; i < _input_layer_size; i++) {
+          var activation = _input[i];
+          // colour the graph based on activation
+          if(verbose) {
+            cy.chart.$("#input_" + i).style({
+              "background-color" : activation > 0 
+                ? "rgb(" + activation*255 + ", 0, 0)"
+                : "rgb(0, 0, " + (-activation)*255 + ")"
+            });
+          }
+        }
+      }
 
       // second layer: "hidden"
       for(var h = 0; h < _hidden_layer_size; h++) {  
-        _hidden[h] = 0;
+        var activation = 0;
         for(var i = 0; i < _input_layer_size; i++) {
-          _hidden[h] += _input[i] * input_to_hidden[i][h];
+          activation += _input[i] * input_to_hidden[i][h];
+        }
+        activation = useful.clamp(activation, -1, 1);
+        _hidden[h] = activation;
+
+        // colour the graph based on activation
+        if(verbose) {
+          cy.chart.$("#hidden_" + h).style({
+            "background-color" : activation > 0 
+              ? "rgb(" + activation*255 + ", 0, 0)"
+              : "rgb(0, 0, " + (-activation)*255 + ")"
+          });
         }
       }
 
       // third layer: "output"
       for(var o = 0; o < _output_layer_size; o++) {  
-        _output[o] = 0;
+        var activation = 0;
         for(var h = 0; h < _hidden_layer_size; h++) {
-          _output[o] += _hidden[h] * hidden_to_output[h][o];
+          activation += _hidden[h] * hidden_to_output[h][o];
+        }
+        activation = useful.clamp(activation, -1, 1);
+        _output[o] = activation;
+
+        // colour the graph based on activation
+        if(verbose) {
+          cy.chart.$("#output_" + o).style({
+            "background-color" : activation > 0 
+              ? "rgb(" + activation*255 + ", 0, 0)"
+              : "rgb(0, 0, " + (-activation)*255 + ")"
+          });
         }
       }
 
@@ -198,11 +233,11 @@ var genetic = function() {
     
     return run_length;
   }
-
+  
   // ------------------------------------------------------------------------------------------
   // PUBLIC CONSTANTS
   // ------------------------------------------------------------------------------------------
-
+  
   genetic.evolve_to_play = function *(args) {
     // unpacks arguments
     const game = args.game;
@@ -210,6 +245,10 @@ var genetic = function() {
     const run_count = args.run_count;
     const max_run_length = args.max_run_length;
 
+    // build the chart to display the graph working
+    var state_descriptions = game.get_state_descriptions();
+    _build_chart(state_descriptions);
+    
     // play multiple times 
     var best_solution = null;
     var best_solution_run_length = -Infinity;
@@ -237,10 +276,6 @@ var genetic = function() {
     if(best_solution_run_length >= max_run_length) {
       console.warn("the run was cut short to prevent a forever loop");
     }
-    
-    // build the chart to display the graph working
-    var state_descriptions = game.get_state_descriptions();
-    _build_chart(state_descriptions);
 
     // run the game with the solution we found
     var stop = false;

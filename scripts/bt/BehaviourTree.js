@@ -46,7 +46,6 @@ var BehaviourTree = function() {
   BehaviourTree.styles = [];
   BehaviourTree.styles[BehaviourTree.SUCCESS] = {
     "background-color": "yellow"
-
   };
   BehaviourTree.styles[BehaviourTree.FAILURE] = {
     "background-color": "red"
@@ -158,7 +157,6 @@ var BehaviourTree = function() {
     useful.assert(result === BehaviourTree.SUCCESS || result === BehaviourTree.FAILURE || result === BehaviourTree.RUNNING,
       "The behaviour tree update result can only ever be SUCCESS, FAILURE or RUNNING");    
   
-
     // refresh the view
     this.map(function(bt_node) {
       bt_node.chart_node.style(BehaviourTree.styles[bt_node.state]);

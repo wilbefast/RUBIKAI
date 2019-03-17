@@ -29,15 +29,15 @@ var zombierun = function() {
 
   const human_max_stamina = 100;
   const human_acceleration = 0.0012;
-  const human_maxspeed = 0.08;
+  const human_maxspeed = 0.02;
   const human_friction = 1.05;
   const human_bounce = 0.9;
 
   const zombie_base_acceleration = 0.001;
-  const zombie_base_maxspeed = 0.1;
+  const zombie_base_maxspeed = 0.03;
   const zombie_base_friction = 1.02;
   const zombie_acceleration_increase = 0.000001;
-  const zombie_maxspeed_increase = 0.00001;
+  const zombie_maxspeed_increase = 0.000001;
   const zombie_friction_increase = 0.0001;
   const zombie_grab_distance = 0.03;
   const zombie_bounce = 0.07;
@@ -152,9 +152,9 @@ var zombierun = function() {
     }
     human_dx /= human_friction;
     human_dy /= human_friction;
-    var human_vector = vector.normalise(human_dx, human_dy);
-    if(human_vector.originalLength > human_maxspeed) {
-      var brakes = human_maxspeed / human_vector.originalLength;
+    var human_speed = vector.len(human_dx, human_dy);
+    if(human_speed > human_maxspeed) {
+      var brakes = human_maxspeed / human_speed;
       human_dx *= brakes;
       human_dy *= brakes;
     }
@@ -195,9 +195,9 @@ var zombierun = function() {
     }
     zombie_dx /= zombie_friction;
     zombie_dy /= zombie_friction;
-    var zombie_vector = vector.normalise(zombie_dx, zombie_dy);
-    if(zombie_vector.originalLength > zombie_maxspeed) {
-      var brakes = zombie_maxspeed / zombie_vector.originalLength;
+    var zombie_speed = vector.len(zombie_dx, zombie_dy);
+    if(zombie_speed > zombie_maxspeed) {
+      var brakes = zombie_maxspeed / zombie_speed;
       zombie_dx *= brakes;
       zombie_dy *= brakes;
     }
@@ -257,16 +257,16 @@ var zombierun = function() {
 
   zombierun.copy_state_to = function(array) {
     useful.assert(array, "An array must be provided as input");
-    array[0] = 2*human_x - 1;
-    array[1] = 2*human_y - 1;
-    array[2] = human_dx;
-    array[3] = human_dy;
-    array[4] = 2*zombie_x - 1;
-    array[5] = 2*zombie_y - 1;
-    array[6] = zombie_dx;
-    array[7] = zombie_dy;
-    array[8] = 2*human_stamina/human_max_stamina - 1;
-    array[9] = 2*zombie_lifespan/zombie_max_lifespan - 1;
+    array[0] = useful.clamp(2*human_x - 1, -1, 1);
+    array[1] = useful.clamp(2*human_y - 1, -1, 1);
+    array[2] = useful.clamp(human_dx/human_maxspeed, -1, 1);
+    array[3] = useful.clamp(human_dy/human_maxspeed, -1, 1);
+    array[4] = useful.clamp(2*zombie_x - 1, -1, 1);
+    array[5] = useful.clamp(2*zombie_y - 1, -1, 1);
+    array[6] = useful.clamp(zombie_dx/zombie_maxspeed, -1, 1);
+    array[7] = useful.clamp(zombie_dy/zombie_maxspeed, -1, 1);
+    array[8] = useful.clamp(2*human_stamina/human_max_stamina - 1, -1, 1);
+    array[9] = useful.clamp(2*zombie_lifespan/zombie_max_lifespan - 1, -1, 1);
   }
 
   zombierun.get_state_descriptions = function() {

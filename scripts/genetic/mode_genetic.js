@@ -56,7 +56,9 @@ var mode_genetic = function() {
         while(!stop) {  
           if(reset) {
             zombierun.reset();
-            console.log("last run had length", run_length);
+            if(run_length > 0) {
+              console.log("last run had length", run_length);
+            }
             run_length = 0;
             reset = false;
           }
