@@ -173,6 +173,37 @@ var genetic = function() {
     }
   }
 
+  const _get_mutated_weights = function(parent, max_mutation) {
+    const parent_weights = parent.weights;
+
+    const parent_input_to_hidden = parent_weights.input_to_hidden;
+    var input_to_hidden = new Array(_input_layer_size);
+    for(var i = 0; i < _input_layer_size; i++) {
+      input_to_hidden[i] = new Array(_hidden_layer_size);
+      for(var h = 0; h < _hidden_layer_size; h++) {
+        var mutation = (Math.random() - Math.random())*max_mutation;
+        var weight = useful.clamp(parent_input_to_hidden[i][h] + mutation, -1, 1);
+        input_to_hidden[i][h] = weight;
+      }
+    }
+    
+    const parent_hidden_to_output = parent_weights.hidden_to_output;
+    var hidden_to_output = new Array(_hidden_layer_size);
+    for(var h = 0; h < _hidden_layer_size; h++) {
+      hidden_to_output[h] = new Array(_output_layer_size);
+      for(var o = 0; o < _output_layer_size; o++) {  
+        var mutation = (Math.random() - Math.random())*max_mutation;
+        var weight = useful.clamp(parent_hidden_to_output[h][o] + mutation, -1, 1);
+        hidden_to_output[h][o] = weight;
+      }
+    }
+
+    return {
+      input_to_hidden : input_to_hidden,
+      hidden_to_output : hidden_to_output
+    }
+  }
+
   const _get_average_run_length = function * (args) {
     var number_of_runs_to_average = args.number_of_runs_to_average;
     var total_length_of_runs = 0;
@@ -265,21 +296,57 @@ var genetic = function() {
     
     return run_length;
   }
+
+  const _colour_chart_edges = function(solution) {
+    // set weights in chart to those we found in our solution
+    var input_to_hidden = solution.weights.input_to_hidden;
+    var hidden_to_output = solution.weights.hidden_to_output;
+    for(var i = 0; i < _input_layer_size; i++) {
+      for(var h = 0; h < _hidden_layer_size; h++) {
+        var weight = input_to_hidden[i][h];
+        var abs_weight = Math.abs(weight);
+        cy.chart.$("edge[source = 'input_" + i + "'][target = 'hidden_" + h + "']")
+        .style({
+          "line-color" : weight > 0 
+            ? "rgb(" + weight*255 + ", 0, 0)"
+            : "rgb(0, 0, " + (-weight)*255 + ")",
+          "width" : abs_weight*abs_weight*abs_weight*6
+        });
+      }
+    }
+    for(var h = 0; h < _hidden_layer_size; h++) {
+      for(var o = 0; o < _output_layer_size; o++) {
+        var weight = hidden_to_output[h][o];
+        var abs_weight = Math.abs(weight);
+        cy.chart.$("edge[source = 'hidden_" + h + "'][target = 'output_" + o + "']")
+        .style({
+          "line-color" : weight > 0 
+            ? "rgb(" + weight*255 + ", 0, 0)"
+            : "rgb(0, 0, " + (-weight)*255 + ")",
+          "width" : abs_weight*abs_weight*abs_weight*6
+        });
+      }
+    }
+  }
   
   // ------------------------------------------------------------------------------------------
   // PUBLIC CONSTANTS
   // ------------------------------------------------------------------------------------------
   
   genetic.evolve_to_play = function *(args) {
-    // unpacks arguments
+    // unpack arguments
     const game = args.game;
     const verbose = args.verbose;
     const population_size = args.population_size;
     const fitness_threshold_i = Math.floor((1 - args.fitness_threshold)*population_size);
-    useful.assert(fitness_threshold_i >= 0, "fitness threshold cannot be negative");
-    useful.assert(fitness_threshold_i <= population_size, "fitness threshold cannot be above population size");
     const number_of_generations = args.number_of_generations;
     const max_run_length = args.max_run_length;
+    const max_mutation = args.max_mutation;
+    const number_of_runs_to_average = args.number_of_runs_to_average;
+
+    // build the chart to display the graph working
+    var state_descriptions = game.get_state_descriptions();
+    _build_chart(state_descriptions);
 
     // create the first ever generation from pure random
     var population = new Array(population_size);
@@ -314,7 +381,22 @@ var genetic = function() {
     for(var g = 1; g < number_of_generations; g++){
       // keep, but mutate, the fittest
       for(var p = 0; p < fitness_threshold_i; p++) {
-        population[p] = previous_population[p];
+        // mutate the weights
+        var weights = _get_mutated_weights(previous_population[p], max_mutation);
+
+        // run through game with these weights
+        var run_length = yield * _get_average_run_length({
+          game : game,
+          number_of_runs_to_average : number_of_runs_to_average,
+          max_run_length : max_run_length,
+          weights : weights
+        });
+
+        // save this individual into the population list
+        population[p] = {
+          weights : weights,
+          run_length : run_length
+        };
       }
 
       // replace all the others with children of the fittest
@@ -365,41 +447,8 @@ var genetic = function() {
       population = overwrite_me;
 
       // pause for dramatic effect
+      _colour_chart_edges(best);
       yield * babysitter.waitForNextFrame();
-    }
-
-    // build the chart to display the graph working
-    var state_descriptions = game.get_state_descriptions();
-    _build_chart(state_descriptions);
-
-    // set weights in chart to those we found in our solution
-    var input_to_hidden = best.weights.input_to_hidden;
-    var hidden_to_output = best.weights.hidden_to_output;
-    for(var i = 0; i < _input_layer_size; i++) {
-      for(var h = 0; h < _hidden_layer_size; h++) {
-        var weight = input_to_hidden[i][h];
-        var abs_weight = Math.abs(weight);
-        cy.chart.$("edge[source = 'input_" + i + "'][target = 'hidden_" + h + "']")
-        .style({
-          "line-color" : weight > 0 
-            ? "rgb(" + weight*255 + ", 0, 0)"
-            : "rgb(0, 0, " + (-weight)*255 + ")",
-          "width" : abs_weight*abs_weight*abs_weight*6
-        });
-      }
-    }
-    for(var h = 0; h < _hidden_layer_size; h++) {
-      for(var o = 0; o < _output_layer_size; o++) {
-        var weight = hidden_to_output[h][o];
-        var abs_weight = Math.abs(weight);
-        cy.chart.$("edge[source = 'hidden_" + h + "'][target = 'output_" + o + "']")
-        .style({
-          "line-color" : weight > 0 
-            ? "rgb(" + weight*255 + ", 0, 0)"
-            : "rgb(0, 0, " + (-weight)*255 + ")",
-          "width" : abs_weight*abs_weight*abs_weight*6
-        });
-      }
     }
 
     // run the game with the solution we found
