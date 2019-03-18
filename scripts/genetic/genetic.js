@@ -118,7 +118,7 @@ var genetic = function() {
     }); 
   }
 
-  const _create_random_solution = function() {
+  const _get_random_weights = function() {
     var input_to_hidden = new Array(_input_layer_size);
     for(var i = 0; i < _input_layer_size; i++) {
       input_to_hidden[i] = new Array(_hidden_layer_size);
@@ -141,6 +141,38 @@ var genetic = function() {
     }
   }
 
+  const _get_child_weights = function(parent_1, parent_2) {
+    const weights_1 = parent_1.weights;
+    const weights_2 = parent_2.weights;
+
+    const input_to_hidden_1 = weights_1.input_to_hidden;
+    const input_to_hidden_2 = weights_2.input_to_hidden;
+    var input_to_hidden = new Array(_input_layer_size);
+    for(var i = 0; i < _input_layer_size; i++) {
+      input_to_hidden[i] = new Array(_hidden_layer_size);
+      for(var h = 0; h < _hidden_layer_size; h++) {
+        const donor = Math.random() > 0.5 ? input_to_hidden_1 : input_to_hidden_2;
+        input_to_hidden[i][h] = donor[i][h];
+      }
+    }
+
+    const hidden_to_output_1 = weights_1.hidden_to_output;
+    const hidden_to_output_2 = weights_2.hidden_to_output;
+    var hidden_to_output = new Array(_hidden_layer_size);
+    for(var h = 0; h < _hidden_layer_size; h++) {
+      hidden_to_output[h] = new Array(_output_layer_size);
+      for(var o = 0; o < _output_layer_size; o++) {  
+        const donor = Math.random() > 0.5 ? hidden_to_output_1 : hidden_to_output_2;
+        hidden_to_output[h][o] = donor[h][o];
+      }
+    }
+
+    return {
+      input_to_hidden : input_to_hidden,
+      hidden_to_output : hidden_to_output
+    }
+  }
+
   const _get_average_run_length = function * (args) {
     var number_of_runs_to_average = args.number_of_runs_to_average;
     var total_length_of_runs = 0;
@@ -153,8 +185,8 @@ var genetic = function() {
   const _get_run_length = function * (args) {
     const game = args.game;
     const max_run_length = args.max_run_length || Infinity;
-    const input_to_hidden = args.solution.input_to_hidden;
-    const hidden_to_output = args.solution.hidden_to_output;
+    const input_to_hidden = args.weights.input_to_hidden;
+    const hidden_to_output = args.weights.hidden_to_output;
     const verbose = args.verbose;
 
     // restart game play until we die
@@ -242,44 +274,107 @@ var genetic = function() {
     // unpacks arguments
     const game = args.game;
     const verbose = args.verbose;
-    const run_count = args.run_count;
+    const population_size = args.population_size;
+    const fitness_threshold_i = Math.floor((1 - args.fitness_threshold)*population_size);
+    useful.assert(fitness_threshold_i >= 0, "fitness threshold cannot be negative");
+    useful.assert(fitness_threshold_i <= population_size, "fitness threshold cannot be above population size");
+    const number_of_generations = args.number_of_generations;
     const max_run_length = args.max_run_length;
 
-    // build the chart to display the graph working
-    var state_descriptions = game.get_state_descriptions();
-    _build_chart(state_descriptions);
-    
-    // play multiple times 
-    var best_solution = null;
-    var best_solution_run_length = -Infinity;
-    for(var r = 0; r < run_count; r++) {
-      // create a random solution
-      var solution = _create_random_solution();
+    // create the first ever generation from pure random
+    var population = new Array(population_size);
+    for(var p = 0; p < population_size; p++) {
+      // create a random weights
+      var weights = _get_random_weights();
 
-      // run through game with this solution
+      // run through game with these weights
       var run_length = yield * _get_average_run_length({
         game : game,
         number_of_runs_to_average : 10,
         max_run_length : max_run_length,
-        solution : solution
+        weights : weights
       });
 
-      // check whether the latest run was the best yet
-      if(run_length > best_solution_run_length) {
-        best_solution_run_length = run_length;
-        best_solution = solution;
-      }
+      // save this individual into the population list
+      population[p] = {
+        weights : weights,
+        run_length : run_length
+      };
     }
 
-    // print results
-    console.log("best solution of", run_count, "had average length", best_solution_run_length);
-    if(best_solution_run_length >= max_run_length) {
-      console.warn("the run was cut short to prevent a forever loop");
+    // sort the first generation
+    population.sort(function(a, b) {
+      return b.run_length - a.run_length;
+    });
+    var best = population[0];
+
+    // this first generation is now the previous generation
+    var previous_population = population;
+    var population = new Array(population_size); 
+    for(var g = 1; g < number_of_generations; g++){
+      // keep, but mutate, the fittest
+      for(var p = 0; p < fitness_threshold_i; p++) {
+        population[p] = previous_population[p];
+      }
+
+      // replace all the others with children of the fittest
+      for(var p = fitness_threshold_i; p < population_size; p++) {
+        // meet the parents
+        var parent_i = p % fitness_threshold_i;
+        var parent_1 = previous_population[parent_i];
+        useful.assert(parent_1, "parent_1 must be defined");
+        useful.assert(parent_1.weights, "parent_1 must have weights defined");
+        parent_i = Math.floor(Math.random() * (fitness_threshold_i - 1));
+        var parent_2 = previous_population[parent_i];
+        useful.assert(parent_2, "parent_2 must be defined");
+        useful.assert(parent_2.weights, "parent_2 must have weights defined");
+
+        // create a random weights
+        var weights = _get_child_weights(parent_1, parent_2);
+
+        // run through game with these weights
+        var run_length = yield * _get_average_run_length({
+          game : game,
+          number_of_runs_to_average : 10,
+          max_run_length : max_run_length,
+          weights : weights
+        });
+
+        // save this individual into the population list
+        population[p] = {
+          weights : weights,
+          run_length : run_length
+        };
+      }
+
+      // sort this generation
+      population.sort(function(a, b) {
+        return b.run_length - a.run_length;
+      });
+
+      // print results
+      best = population[0];
+      console.log("generation", g, "best average run length:", best.run_length);
+      if(best.run_length >= max_run_length) {
+        console.warn("the run was cut short to prevent a forever loop");
+      }
+
+      // swap the array pointers
+      var overwrite_me = previous_population;
+      previous_population = population;
+      population = overwrite_me;
+
+      // pause for dramatic effect
+      yield * babysitter.waitForNextFrame();
     }
+
+    // build the chart to display the graph working
+    var state_descriptions = game.get_state_descriptions();
+    _build_chart(state_descriptions);
 
     // set weights in chart to those we found in our solution
-    var input_to_hidden = best_solution.input_to_hidden;
-    var hidden_to_output = best_solution.hidden_to_output;
+    var input_to_hidden = best.weights.input_to_hidden;
+    var hidden_to_output = best.weights.hidden_to_output;
     for(var i = 0; i < _input_layer_size; i++) {
       for(var h = 0; h < _hidden_layer_size; h++) {
         var weight = input_to_hidden[i][h];
@@ -312,7 +407,7 @@ var genetic = function() {
     while(!stop) {
       var run_length = yield * _get_run_length({
         game : game,
-        solution : best_solution,
+        weights : best.weights,
         verbose : true
       });
       console.log("last run had length", run_length);

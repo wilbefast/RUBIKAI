@@ -75,7 +75,10 @@ var mode_genetic = function() {
       // run the game
       babysitter.add(genetic.evolve_to_play, {
         game : zombierun,
-        run_count : 1000,
+        population_size : 1000,
+        number_of_generations : 10,
+        fitness_threshold : 0.9,
+        max_mutation : 0.1,
         max_run_length : 10000
       });
     }
