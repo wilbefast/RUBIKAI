@@ -36,6 +36,12 @@ var genetic = function() {
   const _output = new Array(_output_layer_size);
 
   // ------------------------------------------------------------------------------------------
+  // PRIVATE VARIABLES
+  // ------------------------------------------------------------------------------------------
+
+  var _learning_duration = 0;
+
+  // ------------------------------------------------------------------------------------------
   // PRIVATE FUNCTIONS
   // ------------------------------------------------------------------------------------------
   
@@ -283,6 +289,7 @@ var genetic = function() {
       game.control(_output[0], _output[1]);
 
       // update the game
+      _learning_duration++;
       var human_died = game.update();
       if(!human_died) {
         run_length++;
@@ -328,12 +335,19 @@ var genetic = function() {
       }
     }
   }
+
+  const _format_with_commas = function(n) {
+    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
   
   // ------------------------------------------------------------------------------------------
   // PUBLIC CONSTANTS
   // ------------------------------------------------------------------------------------------
   
   genetic.evolve_to_play = function *(args) {
+    // reset performance counter
+    _learning_duration = 0;
+
     // unpack arguments
     const game = args.game;
     const verbose = args.verbose;
@@ -437,6 +451,7 @@ var genetic = function() {
       // print results
       best = population[0];
       console.log("generation", g, "best average run length:", best.run_length);
+      console.log("total updates so far:", _format_with_commas(_learning_duration));
       if(best.run_length >= max_run_length) {
         console.warn("the run was cut short to prevent a forever loop");
       }
