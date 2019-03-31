@@ -102,8 +102,10 @@ var mode_bt = function() {
     });
 
     // create a maze
-    babysitter.add(astar.generate_maze, {
-      verbose : false
+    babysitter.add(maze.generate, {
+      verbose : false,
+      room_count : Math.floor(7 + Math.random()*3)
+      
     });
 
     // set up AI caveman

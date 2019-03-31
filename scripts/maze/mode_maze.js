@@ -1,5 +1,5 @@
 /*
-(C) Copyright 2017 William Dyce
+(C) Copyright 2019 William Dyce
 
 All rights reserved. This program and the accompanying materials
 are made available under the terms of the GNU Lesser General Public License
@@ -15,14 +15,14 @@ Lesser General Public License for more details.
 "use strict";
 
 // ----------------------------------------------------------------------------
-// A* DEMO
+// MAZE GENERATION DEMO
 // ----------------------------------------------------------------------------
 
-var mode_astar = function() {
-  var mode_astar = {
+var mode_maze = function() {
+  var mode_maze = {
   }
 
-  mode_astar.init = function() {
+  mode_maze.init = function() {
         
     // clean up
     mutex.force_release();    
@@ -50,23 +50,15 @@ var mode_astar = function() {
       closed : {
         name : "closed",
         colour : "yellow"    
-      },
-      path : {
-        name : "path",
-        colour : "tan"
-      },
-      player : {
-        name : "player",
-        colour : "blue"      
       }
     }   
 
     // set random seed, for easier debugging
-    Math.seedrandom('To be or not to be, that is the question.');
+    Math.seedrandom("Links rechts gradeaus, do bist I'm Labyrinth");
 
     // create a nice big grid
     grid = new Grid({
-      n_cols : 80,
+      n_cols : 40,
       n_rows : 40,
       tile_class : Tile,
       tile_draw_w : 16,
@@ -75,24 +67,21 @@ var mode_astar = function() {
 
     // create a maze
     babysitter.add(maze.generate, {
-      room_count : Math.floor(7 + Math.random()*3),
       verbose : true,
-      verbose_skip : 50
-    });
-
-    // spawn the player
-    babysitter.add(astar.spawn_player);
-  }
-
-  mode_astar.left_click = function(tile) {
-    // move the player
-    babysitter.add(astar.move_to, {
-      destination : tile,
-      verbose : true
+      verbose_skip : 1
     });
   }
 
-  mode_astar.right_click = function(tile) {
+  mode_maze.left_click = function(tile) {
+    // restart maze from clicked tile
+    babysitter.add(maze.generate, {
+      start_tile : tile,
+      verbose : true,
+      verbose_skip : 1
+    });
+  }
+
+  mode_maze.right_click = function(tile) {
     // right click is not bound to anything
   }
 
@@ -100,5 +89,5 @@ var mode_astar = function() {
   // EXPORT
   // ------------------------------------------------------------------------------------------
 
-  return mode_astar;
+  return mode_maze;
 }();

@@ -17,6 +17,9 @@
   <script type="text/javascript" src="scripts/TileObject.js" defer="true"></script>
   <script type="text/javascript" src="scripts/Grid.js" defer="true"></script>
   <script type="text/javascript" src="scripts/mutex.js" defer="true"></script>
+  <!-- Maze generation -->
+  <script type="text/javascript" src="scripts/maze/maze.js" defer="true"></script>
+  <script type="text/javascript" src="scripts/maze/mode_maze.js" defer="true"></script>
   <!-- A* -->
   <script type="text/javascript" src="scripts/astar/astar.js" defer="true"></script>
   <script type="text/javascript" src="scripts/astar/mode_astar.js" defer="true"></script>
@@ -64,6 +67,7 @@
     </div>
 
     <div style="position: absolute; top: 8px; left: 8px; user-select: none;">
+      <button onclick="babysitter.clear(); mode = mode_maze; mode.init();">Maze demo</button>
       <button onclick="babysitter.clear(); mode = mode_astar; mode.init();">A* demo</button>
       <button onclick="babysitter.clear(); mode = mode_minimax; mode.init();">Minimax demo</button>
       <button onclick="babysitter.clear(); mode = mode_bt; mode.init();">Behaviour Tree demo</button>
