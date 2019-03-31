@@ -75,7 +75,8 @@ var mode_astar = function() {
 
     // create a maze
     babysitter.add(astar.generate_maze, {
-      verbose : true
+      verbose : true,
+      verbose_skip : 50
     });
 
     // spawn the player

@@ -116,7 +116,7 @@ var Tile = function() {
     var neighbours = _get_neighbours_from_type(this, type);
     for(var i = 0; i < neighbours.length; i++) {
       var n = neighbours[i];
-      if(n && n.index === type.index) {
+      if(n && n.hash === other.hash) {
         return true;
       }
     }    
@@ -164,6 +164,10 @@ var Tile = function() {
 
   Tile.prototype.distance_to = function(other_tile) {
     return vector.dist(this.col, this.row, other_tile.col, other_tile.row);
+  }
+
+  Tile.prototype.is_edge = function() {
+    return !(this.N && this.S && this.E && this.W);
   }
 
   // ------------------------------------------------------------------------------------------

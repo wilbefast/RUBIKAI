@@ -66,7 +66,9 @@ var astar = function() {
     });
 
     // pick random starting tile
-    var start_tile = grid.get_random_tile();
+    var start_tile = grid.get_random_tile(function(t) {
+      return !t.is_edge();
+    });
     
     // snake out from starting tile
     var open = [ start_tile ];
@@ -79,7 +81,7 @@ var astar = function() {
         // remove the wall from this tile
         tile.set_type("free");
 
-        // remove all the adjacent tile from the open list
+        // remove all the adjacent tiles from the open list
         tile.map_neighbours("8", function(n) {
           if(n.is_type("open")) {
             n.set_type("wall");
@@ -88,18 +90,22 @@ var astar = function() {
 
         // recurse from this tile
         tile.map_neighbours("4", function(neighbour) {
-          // only open tiles which do not already have adjacent opened tiles
-          if(neighbour.all_neighbours("4", function(n) {
+          // only open non-edge tiles which do not already have adjacent opened tiles
+          if(!neighbour.is_edge() 
+          && neighbour.all_neighbours("4", function(n) {
             return n === tile || n.is_type("wall");
+          }) 
+          && neighbour.all_neighbours("X", function(n) {
+            return n.is_neighbour_of("4", tile) || n.is_type("wall");
           })) {
             neighbour.set_type("open");
             open.push(neighbour);
           }
         });
   
-        // skip show maze creation progress every 50 frames if in verbose mode 
+        // skip show maze creation progress every few frames if in verbose mode 
         frame_count++;
-        if(args.verbose && !(frame_count%50)) {
+        if(args.verbose && !(frame_count%((args.verbose_skip || 0) + 1))) {
           yield * babysitter.waitForNextFrame();     
         }
       };
