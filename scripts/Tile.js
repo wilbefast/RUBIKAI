@@ -64,7 +64,12 @@ var Tile = function() {
   }
 
   Tile.prototype.is_pathable = function() {
-    return (this.tile_type.is_pathable === undefined) || (this.tile_type.is_pathable === true);
+    if(this.contents) {
+      return false;
+    }
+    else {
+      return (this.tile_type.is_pathable === undefined) || (this.tile_type.is_pathable === true);
+    }
   }
 
   // ------------------------------------------------------------------------------------------

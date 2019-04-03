@@ -123,7 +123,7 @@ var mode_bt = function() {
       caveman_home_tile.set_type("caveman_home");
 
       // create the cavemen
-      var cavemen_to_spawn = 1;
+      var cavemen_to_spawn = 4;
       var cavemen = [];
       var caveman_tile = caveman_home_tile.map_neighbours("4", function(n) {
         if(cavemen_to_spawn-- > 0) {

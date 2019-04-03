@@ -58,7 +58,9 @@ var ActionNode_GotoNearest = function() {
       if(args.timer < 0) {
         var new_tile = args.path[0];
         if(new_tile.contents) {
-          return this.state = BehaviourTree.FAILURE; 
+          args.path = astar.get_path_to_any(args.tile, this.such_that);
+          args.timer = 0.5;
+          //return this.state = BehaviourTree.FAILURE; 
         }
         else {
           args.path.shift();
