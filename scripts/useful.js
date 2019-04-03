@@ -105,8 +105,20 @@ var useful = function() {
   }
   
   useful.lerp = function(a, b, amount) {
+    useful.assert(amount >= 0 && amount <= 1);   
     useful.clamp(amount, 0, 1)
     return ((1-amount)*a + amount*b);
+  }
+
+  useful.boost = function(heuristic_value, boost_amount) {
+    useful.assert(heuristic_value >= 0 && heuristic_value <= 1);
+    useful.assert(boost_amount >= -1 && boost_amount <= 1);
+    if(boost_amount > 0) {
+      return useful.lerp(heuristic_value, 1, boost_amount);
+    }
+    else {
+      return useful.lerp(heuristic_value, 0, -boost_amount);      
+    }
   }
   
   useful.smoothStep = function(N, x) {

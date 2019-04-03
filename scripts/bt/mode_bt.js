@@ -115,12 +115,13 @@ var mode_bt = function() {
 
       // create the caveman's house
       var caveman_home_tile = grid.get_random_tile(function(tile) {
-        return tile.is_type("free") && tile.all_neighbours("8", function(n) {
-          return n.is_type("free");
-        });
+        return tile.is_type("free") && !tile.is_edge();
       });
       useful.assert(caveman_home_tile, "there must be a tile for the player to spawn on");
       caveman_home_tile.set_type("caveman_home");
+      caveman_home_tile.map_neighbours("8", function(n) {
+        n.set_type("free");
+      });
 
       // create the cavemen
       var cavemen_to_spawn = 4;
@@ -130,13 +131,20 @@ var mode_bt = function() {
           cavemen.push(new Caveman({
             tile : n
           }));
+          n.map_neighbours("8", function(nn) {
+            if(!nn.is_type("caveman_home")) {
+              nn.set_type("free");
+            }
+          });
         }
       });
       
       // create berries
       for(var i = 0; i < 0.1*grid.tiles.length; i++) {
         var berry_tile = grid.get_random_tile(function(tile) {
-          return !tile.contents && tile.is_type("free");
+          return !tile.contents && tile.is_type("free") && !tile.any_neighbours("8", function(n) {
+            return n.contents && n.contents.is_caveman;
+          });
         });
         useful.assert(berry_tile, "it should be possible to find valid tiles to receive berries");
         new Berry({

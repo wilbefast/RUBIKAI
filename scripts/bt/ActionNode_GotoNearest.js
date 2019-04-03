@@ -49,22 +49,37 @@ var ActionNode_GotoNearest = function() {
     }
 
     if(!args.path) {
+      // No path? Get a new one
       args.path = astar.get_path_to_any(args.tile, this.such_that);
-      args.timer = 0.5;
+      if(args.path.length <= 0) {
+        // couldn't find a new path
+        return this.state = BehaviourTree.FAILURE; 
+      }
+      else {
+        args.timer = 0.5;
+      }
     }
 
     if (args.path.length > 0) {
-      args.timer -= dt;
-      if(args.timer < 0) {
-        var new_tile = args.path[0];
-        if(new_tile.contents) {
-          args.path = astar.get_path_to_any(args.tile, this.such_that);
-          args.timer = 0.5;
-          //return this.state = BehaviourTree.FAILURE; 
+
+      var path_end = args.path[args.path.length - 1];
+      var path_start = args.path[0];
+      if(!this.such_that(path_end) || !this.such_that(path_start)) {
+        // Invalid path? Get a new one
+        args.path = astar.get_path_to_any(args.tile, this.such_that);
+        if(args.path.length <= 0) {
+          // couldn't find a new path
+          return this.state = BehaviourTree.FAILURE; 
         }
         else {
+          args.timer = 0.5;
+        }
+      }
+      else {
+        args.timer -= dt;
+        if(args.timer < 0) {
           args.path.shift();
-          args.set_tile(new_tile);
+          args.set_tile(path_start);
           args.timer += 0.1;         
         }
       }

@@ -352,7 +352,8 @@ var genetic = function() {
     const game = args.game;
     const verbose = args.verbose;
     const population_size = args.population_size;
-    const fitness_threshold_i = Math.floor((1 - args.fitness_threshold)*population_size);
+    const fitness_threshold_i = Math.ceil((1 - args.fitness_threshold)*population_size);
+    useful.assert(fitness_threshold_i > 0 && fitness_threshold_i <= population_size, "fitness threshold index must be positive");
     const number_of_generations = args.number_of_generations;
     const max_run_length = args.max_run_length;
     const max_mutation = args.max_mutation;
@@ -371,7 +372,7 @@ var genetic = function() {
       // run through game with these weights
       var run_length = yield * _get_average_run_length({
         game : game,
-        number_of_runs_to_average : 10,
+        number_of_runs_to_average : number_of_runs_to_average,
         max_run_length : max_run_length,
         weights : weights
       });
@@ -431,7 +432,7 @@ var genetic = function() {
         // run through game with these weights
         var run_length = yield * _get_average_run_length({
           game : game,
-          number_of_runs_to_average : 10,
+          number_of_runs_to_average : number_of_runs_to_average,
           max_run_length : max_run_length,
           weights : weights
         });

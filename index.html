@@ -67,12 +67,12 @@
     </div>
 
     <div style="position: absolute; top: 8px; left: 8px; user-select: none;">
-      <button onclick="babysitter.clear(); mode = mode_maze; mode.init();">Maze demo</button>
-      <button onclick="babysitter.clear(); mode = mode_astar; mode.init();">A* demo</button>
-      <button onclick="babysitter.clear(); mode = mode_minimax; mode.init();">Minimax demo</button>
-      <button onclick="babysitter.clear(); mode = mode_bt; mode.init();">Behaviour Tree demo</button>
-      <button onclick="babysitter.clear(); mode = mode_qlearning; mode.init();">Q-learning demo</button>
-      <button onclick="babysitter.clear(); mode = mode_genetic; mode.init();">Genetic algorithm demo</button>
+      <button onclick="babysitter.clear(); set_mode('mode_maze');">Maze demo</button>
+      <button onclick="babysitter.clear(); set_mode('mode_astar');">A* demo</button>
+      <button onclick="babysitter.clear(); set_mode('mode_minimax');">Minimax demo</button>
+      <button onclick="babysitter.clear(); set_mode('mode_bt');">Behaviour Tree demo</button>
+      <button onclick="babysitter.clear(); set_mode('mode_qlearning');">Q-learning demo</button>
+      <button onclick="babysitter.clear(); set_mode('mode_genetic');">Genetic algorithm demo</button>
     </div>
     <div style="display:none">
       <canvas id="source_canvas" width="1280" height="720">    

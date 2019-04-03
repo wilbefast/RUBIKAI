@@ -72,7 +72,7 @@ var astar = function() {
     while(open.length > 0) {
       var tile = open.shift();
 
-      // have we found a berry (ou autre) ?
+      // have we found a valid tile?
       if(such_that(tile)) {
         // read back the path
         while(tile && tile !== source_tile) {

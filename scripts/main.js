@@ -20,9 +20,13 @@ Lesser General Public License for more details.
 
 // global variables: we'd want to do this more cleanly if this were a 'real' project
 var ctx;
+var cy; 
 var grid;
 var mode;
-var cy; 
+
+var set_mode = function() {
+  console.warn("Not ready to set mode yet");
+}
 
 var main = function() {
 
@@ -45,11 +49,21 @@ var main = function() {
   cy = document.getElementById("cytoscape");
 
   // ----------------------------------------------------------------------------
-  // INITIAL MODE
+  // MODE
   // ----------------------------------------------------------------------------
 
-  mode = mode_bt;
-  mode.init();
+  set_mode = function(mode_name) {
+    mode = window[mode_name];
+    if(mode) {
+      mode.init();
+      localStorage.setItem("last_mode", mode_name);
+    }
+    else {
+      console.warn("Invalid mode name", mode_name);
+    }
+  }
+
+  set_mode(localStorage.getItem("last_mode") || "mode_maze");
 
   // ----------------------------------------------------------------------------
   // LINK UP MOUSE INPUT

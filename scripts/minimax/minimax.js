@@ -220,7 +220,49 @@ var minimax = function() {
   var _evaluate_grid_heuristic = function(local_grid, player) {
     useful.assert(local_grid, "a grid must be specified");
     useful.assert(player, "a player must be specified");
-    return _get_score(local_grid, player)/grid.tiles.length;
+
+    var value = 0;
+    for(var col = 0; col < local_grid.n_cols; col++) {
+      for(var row = 0; row < local_grid.n_rows; row++) {
+        var tile = local_grid.grid_to_tile(col, row);
+        if(tile.is_type(player)) {
+
+          if(tile.is_corner()) {
+            value = useful.boost(value, 0.5);
+          }
+          else if(tile.any_neighbours("8", function(t) {
+            return t.is_corner()
+          })) {
+            value = useful.boost(value, -0.3);
+          }
+          else if (tile.is_edge()) {
+            value = useful.boost(value, 0.3);
+          }
+          else {
+            value = useful.boost(value, 0.1);
+          }
+        }
+        else if(tile.is_type(_other_player[player])) {
+          if(tile.is_corner()) {
+            value = useful.boost(value, -0.5);
+          }
+          else if(tile.any_neighbours("8", function(t) {
+            return t.is_corner();
+          })) {
+            value = useful.boost(value, 0.3);            
+          }
+          else if (tile.is_edge()) {
+            value = useful.boost(value, -0.3);
+          }
+          else {
+            value = useful.boost(value, -0.1);
+          }
+        }
+      }
+    }
+
+    useful.assert(value >= 0 && value <= 1, "utility values should be between 0 and 1"); 
+    return value;
   }
 
   var _evaluate_option_heuristic = function(tile, player) {
@@ -366,7 +408,7 @@ var minimax = function() {
     // Here we're asking the question: "what's the best that could happen?"
     var best_value = -Infinity;
     for(var i = 0; i < options.length; i++) {
-      var alpha_prime = _evaluate_option_minimax_ab(options[i], player, depth + 1);
+      var alpha_prime = _evaluate_option_minimax_ab(options[i], player, depth + 1, alpha, beta);
       alpha = Math.max(alpha, alpha_prime);
       if(alpha >= beta) {
         break;
@@ -486,6 +528,10 @@ var minimax = function() {
       blue_player : 0
     }
 
+    var start_time = new Date().getTime();
+    console.log("blue is controlled by", controllers.blue_player.name);
+    console.log("red is controlled by", controllers.red_player.name);
+
     yield * babysitter.waitForNextFrame();                               
     for(var match_i = 0; match_i < matches; match_i++) {
       console.log("match", match_i, "of", matches)
@@ -579,8 +625,11 @@ var minimax = function() {
     }
 
     // results
+    var end_time = new Date().getTime();
+    var delta_time = end_time - start_time;
     console.log(controllers.red_player.name, "won", Math.floor(victories.red_player/matches*100) + "%", "of the time");
     console.log(controllers.blue_player.name, "won", Math.floor(victories.blue_player/matches*100) + "%", "of the time");
+    console.log("average time per game:", delta_time/matches);
   }
   
   // ------------------------------------------------------------------------------------------
