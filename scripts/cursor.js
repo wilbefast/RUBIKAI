@@ -47,6 +47,10 @@ var cursor = function() {
   }
   
   cursor.left_click = function() {
+    if(cursor.tile) {
+      console.log("left click on", cursor.tile.col, cursor.tile.row);
+    }
+
     if(!cursor.allow_input) {
       return;
     }
@@ -57,6 +61,10 @@ var cursor = function() {
   }
   
   cursor.right_click = function(shiftHeld) {
+    if(cursor.tile) {
+      console.log("right click on", cursor.tile.col, cursor.tile.row);
+    }
+
     if(!cursor.allow_input) {
       return;
     }

@@ -55,7 +55,7 @@ var astar = function() {
  
   astar.get_path_to_any = function(source_tile, such_that) {
     if(!source_tile.is_type("free")) {
-      console.log("invalid source", source_tile.col, source_tile.row);
+      console.log("invalid source", source_tile.col, source_tile.row, "of type", this.tile_type.name);
       return;
     }
 
@@ -117,7 +117,7 @@ var astar = function() {
 
     // clean up
     grid.map(function(tile) {
-      if(tile.is_pathable()) {
+      if(tile.is_type_pathable()) {
         delete tile.previous
         delete tile.current_cost
         delete tile.estimated_total_cost
@@ -210,7 +210,7 @@ var astar = function() {
 
     // clean up
     grid.map(function(tile) {
-      if(tile.is_pathable()) {
+      if(tile.is_type_pathable()) {
         delete tile.previous
         delete tile.current_cost
         delete tile.estimated_total_cost
