@@ -64,7 +64,7 @@ var ActionNode_GotoNearest = function() {
 
       var path_end = args.path[args.path.length - 1];
       var path_start = args.path[0];
-      if(!this.such_that(path_end) || !this.such_that(path_start)) {
+      if(!this.such_that(path_end)) {
         // Invalid path? Get a new one
         args.path = astar.get_path_to_any(args.tile, this.such_that);
         if(args.path.length <= 0) {
