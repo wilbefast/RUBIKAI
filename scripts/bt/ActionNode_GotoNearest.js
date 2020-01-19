@@ -61,7 +61,6 @@ var ActionNode_GotoNearest = function() {
     }
 
     if (args.path.length > 0) {
-
       var path_end = args.path[args.path.length - 1];
       var path_start = args.path[0];
       if(!this.such_that(path_end)) {

@@ -66,10 +66,10 @@ var mode_minimax = function() {
 
     // play some reversi
     babysitter.add(minimax.play, {
-      verbose : true,
-      matches : 10,
-      red_player : "minimax",
-      blue_player : "minimax_ab"
+      verbose : false,
+      matches : 100,
+      red_player : "random",
+      blue_player : "heuristic"
     });
   }
 

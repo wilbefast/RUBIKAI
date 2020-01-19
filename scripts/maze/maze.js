@@ -70,7 +70,11 @@ var maze = function() {
             return n === tile || n.is_type("wall");
           }) 
           && neighbour.all_neighbours("X", function(n) {
-            return n.is_neighbour_of("4", tile) || n.is_type("wall");
+            /// 
+            /// TODO
+            /// COMPLETE THIS TO PREVENT UGLY DIAGONAL CORNERS IN THE MAZE
+            ///
+            return true;
           })) {
             neighbour.set_type("open");
             open.push(neighbour);

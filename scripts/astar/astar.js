@@ -148,7 +148,12 @@ var astar = function() {
     // but for this implementation I'm storing them inside the tile objects for simplicity
     // a cleaner implementation would encapsulate the tiles within a "path state" object
     source_tile.current_cost = 0;
-    source_tile.estimated_total_cost = source_tile.distance_to(destination_tile); 
+
+    /// 
+    /// TODO
+    /// ESTIMATE THE REMAINING COST
+    ///
+    source_tile.estimated_total_cost = Infinity; 
     var open = [ source_tile ];
     source_tile.set_type("open");
 
@@ -173,8 +178,13 @@ var astar = function() {
             return;
           }
           else {
-            var estimated_remaining_cost = n.estimated_remaining_cost || n.distance_to(destination_tile);
-            var new_estimated_total_cost = tile.current_cost + 1 + n.distance_to(destination_tile);
+
+            /// 
+            /// TODO
+            /// ESTIMATE REMAINING AND TOTAL COST
+            ///
+            var estimated_remaining_cost = n.estimated_remaining_cost || Infinity;
+            var new_estimated_total_cost = Infinity;
             
             var change_previous = false;
 
@@ -243,7 +253,13 @@ var astar = function() {
     // but for this implementation I'm storing them inside the tile objects for simplicity
     // a cleaner implementation would encapsulate the tiles within a "path state" object
     _player_tile.current_cost = 0;
-    _player_tile.estimated_total_cost = _player_tile.distance_to(destination_tile); 
+
+    /// 
+    /// TODO
+    /// ESTIMATE THE REMAINING COST
+    ///
+    _player_tile.estimated_total_cost = Infinity
+    
     var open = [ _player_tile ];
     _player_tile.set_type("open");
 
@@ -272,7 +288,12 @@ var astar = function() {
             return;
           }
           else {
-            var estimated_remaining_cost = n.estimated_remaining_cost || n.distance_to(destination_tile);
+            /// 
+            /// TODO
+            /// ESTIMATE REMAINING COST
+            ///
+            var estimated_remaining_cost = Infinity;
+
             var new_estimated_total_cost = tile.current_cost + 1 + n.distance_to(destination_tile);
             
             var change_previous = false;

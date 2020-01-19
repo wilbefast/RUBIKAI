@@ -46,7 +46,7 @@ var mode_genetic = function() {
       draw_h : 512
     });
 
-    var keyboard_control = false;
+    var keyboard_control = true;
     if(keyboard_control) {
       // player control using the keyboard
       babysitter.add(function*() {
@@ -75,12 +75,12 @@ var mode_genetic = function() {
       // run the game
       babysitter.add(genetic.evolve_to_play, {
         game : zombierun,
-        population_size : 100,
-        number_of_generations : 10,
-        fitness_threshold : 0.9,
-        max_mutation : 0.12,
+        population_size : 10,
+        number_of_generations : 5,
+        fitness_threshold : 0.5,
+        max_mutation : 0.7,
         number_of_runs_to_average : 15,
-        max_run_length : 10000,
+        max_run_length : 1000,
       });
     }
 

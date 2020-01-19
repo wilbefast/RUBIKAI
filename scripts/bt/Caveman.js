@@ -121,16 +121,11 @@ var Caveman = function() {
               }
             }
           });
-        var find_berry = new ActionNode_GotoNearest({
-          name : "find_berry",
-          description : "Find berry",                        
-          parent : main_selector,
-          such_that : function(tile) {
-            return tile.any_neighbours("4", function(n) {
-              return n.contents && n.contents.is_berry;
-            });
-          }
-        });
+
+        /// 
+        /// TODO
+        /// ADD AN ACTION NODE TO FIND A BERRY
+        ///
 
     behaviour_tree.build_chart(caveman);
         

@@ -224,39 +224,20 @@ var minimax = function() {
     var value = 0;
     for(var col = 0; col < local_grid.n_cols; col++) {
       for(var row = 0; row < local_grid.n_rows; row++) {
-        var tile = local_grid.grid_to_tile(col, row);
-        if(tile.is_type(player)) {
 
-          if(tile.is_corner()) {
-            value = useful.boost(value, 0.5);
-          }
-          else if(tile.any_neighbours("8", function(t) {
-            return t.is_corner()
-          })) {
-            value = useful.boost(value, -0.3);
-          }
-          else if (tile.is_edge()) {
-            value = useful.boost(value, 0.3);
-          }
-          else {
-            value = useful.boost(value, 0.1);
-          }
+        
+        var tile = local_grid.grid_to_tile(col, row);
+
+        /// 
+        /// TODO
+        /// REPLACE THIS CALCULATION WITH SOMETHING BETTER
+        ///
+
+        if(tile.is_type(player)) {
+          value = useful.boost(value, 0.1);
         }
         else if(tile.is_type(_other_player[player])) {
-          if(tile.is_corner()) {
-            value = useful.boost(value, -0.5);
-          }
-          else if(tile.any_neighbours("8", function(t) {
-            return t.is_corner();
-          })) {
-            value = useful.boost(value, 0.3);            
-          }
-          else if (tile.is_edge()) {
-            value = useful.boost(value, -0.3);
-          }
-          else {
-            value = useful.boost(value, -0.1);
-          }
+          value = useful.boost(value, -0.1);
         }
       }
     }
@@ -291,12 +272,11 @@ var minimax = function() {
 
     // Here we're asking the question: "what's the worst that could happen?"
     var worst_value = Infinity;
-    for(var i = 0; i < options.length; i++) {
-      var value = _evaluate_option_minimax(options[i], player, depth + 1);
-      if(value < worst_value) {
-        worst_value = value;
-      }
-    }
+
+    /// 
+    /// TODO
+    /// YOUR CODE HERE, OR AN ERROR WILL TRIGGER
+    ///
 
     useful.assert(worst_value >= 0 && worst_value <= 1, "utility values should be between 0 and 1");
     return worst_value;
@@ -309,12 +289,11 @@ var minimax = function() {
 
     // Here we're asking the question: "what's the best that could happen?"
     var best_value = -Infinity;
-    for(var i = 0; i < options.length; i++) {
-      var value = _evaluate_option_minimax(options[i], player, depth + 1);
-      if(value > best_value) {
-        best_value = value;
-      }
-    }
+
+    /// 
+    /// TODO
+    /// YOUR CODE HERE, OR AN ERROR WILL TRIGGER
+    ///
 
     useful.assert(best_value >= 0 && best_value <= 1, "utility values should be between 0 and 1");    
     return best_value;
