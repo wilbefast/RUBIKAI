@@ -22,11 +22,15 @@ var _up = false;
 var _down = false;
 var _left = false;
 var _right = false;
+var _space = false;
+var _enter = false;
 
 var keyboard = function() {
   var keyboard = {
     x : 0,
     y : 0,
+    spacePressed : false,
+    enterPressed : false,
     allow_input : true
   }
 
@@ -82,6 +86,20 @@ var keyboard = function() {
     }
   }
 
+  keyboard.space = function(v) {
+    keyboard.spacePressed = !_space && v;
+    _space = v;
+  }
+
+  keyboard.enter = function(v) {
+    keyboard.enterPressed = !_enter && v;
+    _enter = v;
+  }
+
+  keyboard.update = function(dt) {
+    keyboard.spacePressed = false;
+    keyboard.enterPressed = false;
+  }
 
   // ------------------------------------------------------------------------------------------
   // EXPORT

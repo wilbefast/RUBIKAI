@@ -47,6 +47,20 @@ var babysitter = function() {
     return dt;
   }
 
+  babysitter.waitForSpacebar = function *() {
+    do{
+      yield undefined;
+    }
+    while(!keyboard.spacePressed);
+  }
+
+  babysitter.waitForEnter = function *() {
+    do{
+      yield undefined;
+    }
+    while(!keyboard.enterPressed);
+  }
+
   babysitter.waitForNextFrame = function* () {
     yield undefined;
   }
@@ -60,16 +74,14 @@ var babysitter = function() {
   babysitter.doForSeconds = function* (duration_s, f, onFinish) {
     var duration_ms = duration_s*1000;
     var start_ms = Date.now();
-    var dt = 0.0;
     while(Date.now() - start_ms < duration_ms) {
       var t = (Date.now() - start_ms) / duration_ms;
       f(t);
-      dt = yield undefined;
+      yield undefined;
     }
     if(onFinish) {
       onFinish();
     }
-    return dt;
   }
   
   babysitter.addDoForSeconds = function(duration_s, f, onFinish) {

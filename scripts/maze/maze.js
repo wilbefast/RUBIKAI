@@ -38,15 +38,23 @@ var maze = function() {
     yield * grid.map_coroutine(function*(tile) {
       tile.set_type("wall");      
     });
+    if (args.manual_step) {
+      yield * babysitter.waitForSpacebar();
+    }
 
     // pick random starting tile
     var start_tile = args.start_tile || grid.get_random_tile(function(t) {
       return !t.is_edge();
     });
     
-    // snake out from starting tile
+    // initialise frontier set
     var open = [ start_tile ];
     start_tile.set_type("open");
+    if (args.manual_step) {
+      yield * babysitter.waitForSpacebar();
+    }
+    
+    // snake out from starting tile
     while(open.length > 0) {
       // get the next open tile, make sure it's actually open
       var tile = open.shift();
@@ -54,13 +62,19 @@ var maze = function() {
 
         // remove the wall from this tile
         tile.set_type("free");
-
+        if (args.manual_step) {
+          yield * babysitter.waitForSpacebar();
+        }
+    
         // remove all the adjacent tiles from the open list
         tile.map_neighbours("8", function(n) {
           if(n.is_type("open")) {
             n.set_type("wall");
           };
         });
+        if (args.manual_step) {
+          yield * babysitter.waitForSpacebar();
+        }
 
         // recurse from this tile
         tile.map_neighbours("4", function(neighbour) {
@@ -83,7 +97,10 @@ var maze = function() {
   
         // skip show maze creation progress every few frames if in verbose mode 
         frame_count++;
-        if(args.verbose && !(frame_count%((args.verbose_skip || 0) + 1))) {
+        if (args.manual_step) {
+          yield * babysitter.waitForSpacebar();
+        }
+        else if(args.verbose && !(frame_count%((args.verbose_skip || 0) + 1))) {
           yield * babysitter.waitForNextFrame();     
         }
       };

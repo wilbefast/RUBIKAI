@@ -89,10 +89,12 @@ var main = function() {
   window.addEventListener('keydown', function(event) {
     var up, down, left, right;
     switch(event.keyCode || event.which) {
-      case 38: keyboard.up(true); break;
-      case 40: keyboard.down(true); break;
+      case 13: keyboard.enter(true); break;
+      case 32: keyboard.space(true); break;
       case 37: keyboard.left(true); break;
+      case 38: keyboard.up(true); break;
       case 39: keyboard.right(true); break;
+      case 40: keyboard.down(true); break;
       default: break;      
     }
   });
@@ -100,10 +102,12 @@ var main = function() {
   window.addEventListener('keyup', function(event) {
     var up, down, left, right;
     switch(event.keyCode || event.which) {
-      case 38: keyboard.up(false); break;
-      case 40: keyboard.down(false); break;
+      case 13: keyboard.enter(true); break;
+      case 32: keyboard.space(false); break;
       case 37: keyboard.left(false); break;
+      case 38: keyboard.up(false); break;
       case 39: keyboard.right(false); break;
+      case 40: keyboard.down(false); break;
       default: break;
     }
   });
@@ -131,6 +135,7 @@ var main = function() {
 
   function update(dt) {
     babysitter.update(dt);
+    keyboard.update(dt);
   }
 
   function draw() {

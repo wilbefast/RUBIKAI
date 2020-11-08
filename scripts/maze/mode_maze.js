@@ -67,8 +67,9 @@ var mode_maze = function() {
 
     // create a maze
     babysitter.add(maze.generate, {
-      verbose : true,
-      verbose_skip : 1
+      manual_step : true,
+      // verbose : true,
+      // verbose_skip : 1
     });
   }
 
