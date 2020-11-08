@@ -153,7 +153,8 @@ var astar = function() {
     /// TODO
     /// ESTIMATE THE REMAINING COST
     ///
-    source_tile.estimated_total_cost = Infinity; 
+    source_tile.estimated_remaining_cost = Infinity;
+    source_tile.estimated_total_cost = source_tile.current_cost + source_tile.estimated_remaining_cost; 
     var open = [ source_tile ];
     source_tile.set_type("open");
 
@@ -181,10 +182,10 @@ var astar = function() {
 
             /// 
             /// TODO
-            /// ESTIMATE REMAINING AND TOTAL COST
+            /// ESTIMATE THE REMAINING COST
             ///
             var estimated_remaining_cost = n.estimated_remaining_cost || Infinity;
-            var new_estimated_total_cost = Infinity;
+            var new_estimated_total_cost = n.current_cost + estimated_remaining_cost;
             
             var change_previous = false;
 
@@ -258,7 +259,8 @@ var astar = function() {
     /// TODO
     /// ESTIMATE THE REMAINING COST
     ///
-    _player_tile.estimated_total_cost = Infinity
+    _player_tile.estimated_remaining_cost = Infinity;
+    _player_tile.estimated_total_cost = _player_tile.current_cost + _player_tile.estimated_remaining_cost;
     
     var open = [ _player_tile ];
     _player_tile.set_type("open");
@@ -292,9 +294,8 @@ var astar = function() {
             /// TODO
             /// ESTIMATE REMAINING COST
             ///
-            var estimated_remaining_cost = Infinity;
-
-            var new_estimated_total_cost = tile.current_cost + 1 + n.distance_to(destination_tile);
+            var estimated_remaining_cost = n.estimated_remaining_cost || Infinity;
+            var new_estimated_total_cost = tile.current_cost + estimated_remaining_cost;
             
             var change_previous = false;
 
