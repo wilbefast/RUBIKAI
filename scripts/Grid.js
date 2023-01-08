@@ -272,6 +272,109 @@ var Grid = function() {
     return count;
   };
 
+  Grid.prototype.map_row = function(row, f) {
+    for(var col = 0; col < this.n_cols; col++) {
+      var result = f(this.tiles[row*this.n_cols + col], col, row);
+      if(result) {
+        return result;
+      }
+    }
+  }
+
+  Grid.prototype.any_in_row = function(row, f) {
+    for(var col = 0; col < this.n_cols; col++) {
+      var result = f(this.tiles[row*this.n_cols + col], col, row);
+      if(result) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Grid.prototype.all_in_row = function(row, f) {
+    for(var col = 0; col < this.n_cols; col++) {
+      var result = f(this.tiles[row*this.n_cols + col], col, row);
+      if(!result) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  Grid.prototype.all_in_any_row = function(f) {
+    for(var row = 0; row < this.n_rows; row++) {
+      if (this.all_in_row(row, f)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Grid.prototype.map_col = function(col, f) {
+    for(var row = 0; row < this.n_rows; row++) {
+      var result = f(this.tiles[row*this.n_cols + col], col, row);
+      if(result) {
+        return result;
+      }
+    }
+  }
+
+  Grid.prototype.any_in_col = function(col, f) {
+    for(var row = 0; row < this.n_rows; row++) {
+      var result = f(this.tiles[row*this.n_cols + col], col, row);
+      if(result) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Grid.prototype.all_in_col = function(col, f) {
+    for(var row = 0; row < this.n_rows; row++) {
+      var result = f(this.tiles[row*this.n_cols + col], col, row);
+      if(!result) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  Grid.prototype.all_in_any_col = function(f) {
+    for(var col = 0; col < this.n_cols; col++) {
+      if (this.all_in_col(col, f)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Grid.prototype.all_in_SE_diag = function(f) {
+    var size = Math.min(this.n_rows, this.n_cols);
+    for(var pos = 0; pos < size; pos++) {
+      var row = pos;
+      var col = pos;
+      var result = f(this.tiles[row*this.n_cols + col], col, row);
+      if(!result) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  Grid.prototype.all_in_NE_diag = function(f) {
+    var size = Math.min(this.n_rows, this.n_cols);
+    for(var pos = 0; pos < size; pos++) {
+      var row = this.n_rows - pos - 1;
+      var col = pos;
+      var result = f(this.tiles[row*this.n_cols + col], col, row);
+      if(!result) {
+        return false;
+      }
+    }
+    return true;
+  }
+  
+
   // ------------------------------------------------------------------------------------------
   // EXPORT
   // ------------------------------------------------------------------------------------------

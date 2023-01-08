@@ -49,6 +49,9 @@
   <script type="text/javascript" src="scripts/genetic/zombierun.js" defer="true"></script>  
   <script type="text/javascript" src="scripts/genetic/genetic.js" defer="true"></script>
   <script type="text/javascript" src="scripts/genetic/mode_genetic.js" defer="true"></script>
+  <!-- TensorFlow -->  
+  <script type="text/javascript" src="scripts/tensorflow/tensorflow.js" defer="true"></script>
+  <script type="text/javascript" src="scripts/tensorflow/mode_tensorflow.js" defer="true"></script>
   <!-- Main -->  
   <script type="text/javascript" src="scripts/main.js" defer="true"></script>
   
@@ -73,6 +76,7 @@
       <button onclick="babysitter.clear(); set_mode('mode_bt');">Behaviour Tree demo</button>
       <button onclick="babysitter.clear(); set_mode('mode_qlearning');">Q-learning demo</button>
       <button onclick="babysitter.clear(); set_mode('mode_genetic');">Genetic algorithm demo</button>
+      <button onclick="babysitter.clear(); set_mode('mode_tensorflow');">TensorFlow demo</button>
     </div>
     <div style="display:none">
       <canvas id="source_canvas" width="1280" height="720">    
